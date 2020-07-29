@@ -107,8 +107,12 @@ public class SB {
 	}
 	
 	public static boolean playerIsSignOwner(Sign sign, Player player) {
-		String signName = ChatColor.stripColor(sign.getLine(3).replace("(", "").replace(")", ""));
+		String signName = removeBracketsFromNameLine(sign.getLine(3));
 		return signName.equals(player.getDisplayName());
+	}
+	
+	public static String removeBracketsFromNameLine(String line) {
+		return ChatColor.stripColor(line.replace("(", "").replace(")", ""));
 	}
 
 }

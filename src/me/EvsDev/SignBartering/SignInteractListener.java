@@ -1,9 +1,11 @@
 package me.EvsDev.SignBartering;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -79,6 +81,20 @@ public class SignInteractListener implements Listener {
 		playerInv.addItem(purchase);   // Give purchase to player
 		
 		e.getPlayer().sendMessage(SB.messagePrefix + "Item(s) received");
+		
+		String ownerName = SB.removeBracketsFromNameLine(lines[3]);
+		Player owner = Bukkit.getPlayer(ownerName);
+		if (owner == null) return;
+		
+		String buyAlert = String.format("%s bought [%s]x%s for [%s]x%s from your shop!",
+			e.getPlayer().getDisplayName(),
+			SB.cleanName(sellingItemAndQuantity.item.toString()),
+			Integer.toString(sellingItemAndQuantity.quantity),
+			SB.cleanName(priceItemAndQuantity.item.toString()),
+			Integer.toString(priceItemAndQuantity.quantity)
+		);
+		
+		owner.sendMessage(SB.messagePrefix + buyAlert);
 	}
 
 	
