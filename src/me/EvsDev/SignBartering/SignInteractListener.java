@@ -67,16 +67,62 @@ public class SignInteractListener implements Listener {
 		}
 		
 		Inventory chestInv = ((Chest)SB.getBehindBlock(block).getState()).getBlockInventory();
+		/*
+		Material purchaseItem;
+		if (sellingItemAndQuantity.item != Material.ENCHANTED_BOOK)
+			purchaseItem = sellingItemAndQuantity.item;
+		else
+			purchaseItem = Material.ENCHANTED_BOOK;
+		*/
+		
 		ItemStack purchase = new ItemStack(sellingItemAndQuantity.item, sellingItemAndQuantity.quantity);
+		boolean isEnchantedBook = sellingItemAndQuantity.item == Material.ENCHANTED_BOOK;
 		
 		// Does the chest behind this sign have enough to give?
-		if (!chestInv.containsAtLeast(purchase, 1)) {
-			SB.error(e, "The shop is not currently stocked. Contact the shop owner " + lines[3]);
-			return;
-		}	
+		if (!isEnchantedBook) {
+			if (!chestInv.containsAtLeast(purchase, 1)) {
+				SB.error(e, "The shop is not currently stocked. Contact the shop owner " + lines[3]);
+				return;
+			}
+		} else {
+			boolean isStocked = false;
+			for (ItemStack itemStack : chestInv.getStorageContents()) {
+				Material type;
+				try {
+					type = itemStack.getType();
+				} catch (NullPointerException ee) {
+					continue;
+				}
+				if (!(type == Material.ENCHANTED_BOOK)) {
+					isStocked = false;
+				} else {
+					isStocked = true;
+					break;
+				}
+			}
+			if (!isStocked) {
+				SB.error(e, "The shop is not currently stocked. Contact the shop owner " + lines[3]);
+				return;
+			}
+		}
+		
+		if (isEnchantedBook) {
+			for (ItemStack itemStack : chestInv.getContents()) {
+				Material type;
+				try {
+					type = itemStack.getType();
+				} catch (NullPointerException ee) {
+					continue;
+				}
+				if (type == Material.ENCHANTED_BOOK) {
+					purchase = itemStack;
+					break;
+				}
+			}
+		}
 		
 		playerInv.removeItem(payment); // Take payment
-		chestInv.addItem(payment);     // Store payment in container
+		chestInv.addItem(payment);     // Store payment in container		
 		chestInv.removeItem(purchase); // Take purchase from container
 		playerInv.addItem(purchase);   // Give purchase to player
 		
