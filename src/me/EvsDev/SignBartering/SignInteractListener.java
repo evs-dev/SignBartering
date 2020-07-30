@@ -86,8 +86,14 @@ public class SignInteractListener implements Listener {
 			}
 		} else {
 			boolean isStocked = false;
-			for (ItemStack itemStack : chestInv.getContents()) {
-				if (!(itemStack.getType() == Material.ENCHANTED_BOOK)) {
+			for (ItemStack itemStack : chestInv.getStorageContents()) {
+				Material type;
+				try {
+					type = itemStack.getType();
+				} catch (NullPointerException ee) {
+					continue;
+				}
+				if (!(type == Material.ENCHANTED_BOOK)) {
 					isStocked = false;
 				} else {
 					isStocked = true;
@@ -100,24 +106,25 @@ public class SignInteractListener implements Listener {
 			}
 		}
 		
-		playerInv.removeItem(payment); // Take payment
-		chestInv.addItem(payment);     // Store payment in container
-		
-		if (!isEnchantedBook) {
-			chestInv.removeItem(purchase); // Take purchase from container
-			playerInv.addItem(purchase);   // Give purchase to player
-		} else {
-			ItemStack toRemove = null;
+		if (isEnchantedBook) {
 			for (ItemStack itemStack : chestInv.getContents()) {
-				if (itemStack.getType() == Material.ENCHANTED_BOOK) {
-					toRemove = itemStack;
+				Material type;
+				try {
+					type = itemStack.getType();
+				} catch (NullPointerException ee) {
+					continue;
+				}
+				if (type == Material.ENCHANTED_BOOK) {
+					purchase = itemStack;
 					break;
 				}
 			}
-			if (toRemove == null) return;
-			chestInv.remove(toRemove);
-			playerInv.addItem(toRemove);
 		}
+		
+		playerInv.removeItem(payment); // Take payment
+		chestInv.addItem(payment);     // Store payment in container		
+		chestInv.removeItem(purchase); // Take purchase from container
+		playerInv.addItem(purchase);   // Give purchase to player
 		
 		e.getPlayer().sendMessage(SB.messagePrefix + "Item(s) received");
 		
