@@ -24,9 +24,9 @@ public class ContainerUtil {
 		Location blockLocation = startBlock.getLocation();
 		Location[] surroundingLocations = {
 			blockLocation.add(1, 0, 0),
-			blockLocation.add(1, 0, 1),
+			blockLocation.add(0, 0, 1),
 			blockLocation.subtract(1, 0, 0),
-			blockLocation.subtract(1, 0, 1)
+			blockLocation.subtract(0, 0, 1)
 		};
 		for (Location location : surroundingLocations) {
 			Block block = location.getBlock();
