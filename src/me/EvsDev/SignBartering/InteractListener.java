@@ -1,6 +1,6 @@
 package me.EvsDev.SignBartering;
 
-import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
@@ -13,6 +13,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+
+import net.md_5.bungee.api.ChatColor;
 
 public class InteractListener implements Listener {
 
@@ -75,7 +77,26 @@ public class InteractListener implements Listener {
 			}
 		}
 		if (!isStocked) {
-			SB.error(e, "The shop is not currently stocked. Contact the shop owner " + lines[3]);
+			String appendix;
+			Player owner = SB.getSignOwner(lines[3]);			
+			if (owner != null) {
+				Location blockLocation = block.getLocation();
+				String noStockMessage = String.format(
+						"%s tried to purchase [%s]x%s from your shop at X: %s Y: %s Z: %s but it is out of stock",
+						e.getPlayer().getDisplayName(),
+						SB.cleanName(sellingItemAndQuantity.item.toString()),
+						Integer.toString(sellingItemAndQuantity.quantity),
+						blockLocation.getBlockX(),
+						blockLocation.getBlockY(),
+						blockLocation.getBlockZ()
+				);
+				SB.error(owner, noStockMessage);
+				appendix = "The shop owner " + lines[3] + ChatColor.RED + " has been notified";
+			} else {
+				appendix = "The shop owner " + lines[3] + ChatColor.RED + " could not be notified as they are offline";
+			}
+			SB.error(e, "The shop is not currently stocked. " + appendix);
+			
 			return;
 		}
 		
@@ -107,8 +128,7 @@ public class InteractListener implements Listener {
 		
 		e.getPlayer().sendMessage(SB.messagePrefix + "Item(s) received");
 		
-		String ownerName = SB.removeBracketsFromNameLine(lines[3]);
-		Player owner = Bukkit.getPlayer(ownerName);
+		Player owner = SB.getSignOwner(lines[3]);
 		if (owner == null) return;
 		
 		String buyAlert = String.format("%s bought [%s]x%s for [%s]x%s from your shop!",
