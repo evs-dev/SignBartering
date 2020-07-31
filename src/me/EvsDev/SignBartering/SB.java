@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang.WordUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -82,6 +83,7 @@ public class SB {
 	private static List<Material> signMaterials = Arrays.asList(signMaterialsArr);
 	private static List<Material> wallSignMaterials = Arrays.asList(wallSignMaterialsArr);
 	
+	@Deprecated
 	public static boolean isSign(Material material) {
 		return signMaterials.contains(material);
 	}
@@ -102,6 +104,7 @@ public class SB {
         return block.getRelative(directional.getFacing());
 	}
 	
+	@Deprecated
 	public static boolean isChest(Block block) {
 		return block.getType() == Material.CHEST;
 	}
@@ -113,6 +116,11 @@ public class SB {
 	
 	public static String removeBracketsFromNameLine(String line) {
 		return ChatColor.stripColor(line.replace("(", "").replace(")", ""));
+	}
+	
+	public static Player getSignOwner(String ownerLine) {
+		String ownerName = SB.removeBracketsFromNameLine(ownerLine);
+		return Bukkit.getPlayer(ownerName);
 	}
 
 }
