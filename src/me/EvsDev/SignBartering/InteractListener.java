@@ -2,7 +2,6 @@ package me.EvsDev.SignBartering;
 
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -11,6 +10,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
@@ -54,7 +54,7 @@ public class InteractListener implements Listener {
 		}
 		
 		// Get container inventory
-		Inventory containerInv = ((Chest)SB.getBehindBlock(block).getState()).getBlockInventory();
+		Inventory containerInv = ((InventoryHolder)SB.getBehindBlock(block).getState()).getInventory();
 		
 		// Does the container behind this sign have enough to give?
 		boolean isStocked = false;
@@ -100,10 +100,10 @@ public class InteractListener implements Listener {
 			}
 		}
 		
-		playerInv.removeItem(payment); // Take payment
+		playerInv.removeItem(payment);     // Take payment
 		containerInv.addItem(payment);     // Store payment in container		
 		containerInv.removeItem(purchase); // Take purchase from container
-		playerInv.addItem(purchase);   // Give purchase to player
+		playerInv.addItem(purchase);       // Give purchase to player
 		
 		e.getPlayer().sendMessage(SB.messagePrefix + "Item(s) received");
 		
