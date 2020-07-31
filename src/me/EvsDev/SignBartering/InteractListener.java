@@ -1,7 +1,6 @@
 package me.EvsDev.SignBartering;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
@@ -22,26 +21,23 @@ public class InteractListener implements Listener {
 		if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getHand() != EquipmentSlot.HAND) return;
 		
 		Block block = e.getClickedBlock();
-				
-		// Is sign or chest
-		Material material = block.getType();
 		
-		if (SB.isChest(block)) {
-			Block infrontBlock = SB.getInFrontBlock(block);
-			if (!SB.isWallSign(infrontBlock.getType())) return;
+		// Is container		
+		if (ContainerUtil.isBlockStateContainer(block.getState())) {
+			Block signBlock = ContainerUtil.findSurroundingSellingSignBlock(block);
 			
-			Sign sign = (Sign) infrontBlock.getState();
-			if (!LineChecker.perfectFirstLine(sign.getLine(0))) return;
+			if (signBlock == null) return;
 			
-			if (!SB.playerIsSignOwner(sign, e.getPlayer())) {
-				SB.error(e, "You cannot open this chest as you are not the owner of this shop");
+			if (!SB.playerIsSignOwner((Sign) signBlock.getState(), e.getPlayer())) {
+				SB.error(e, "You cannot open this container as you are not the owner of this shop");
 				e.setCancelled(true);
 			}
 			
 			return;
 		}
 		
-		if (!SB.isWallSign(material)) return;		
+		// Is sign
+		if (!SB.isWallSign(block.getType())) return;
 		
 		// Is [Selling] sign
 		Sign sign = (Sign) block.getState();
@@ -57,7 +53,7 @@ public class InteractListener implements Listener {
 			return;
 		}
 		
-		// Get chest inventory
+		// Get container inventory
 		Inventory chestInv = ((Chest)SB.getBehindBlock(block).getState()).getBlockInventory();
 		
 		// Does the container behind this sign have enough to give?
@@ -93,7 +89,7 @@ public class InteractListener implements Listener {
 			return;
 		}
 		
-		// Find purchase in chest
+		// Find purchase in container
 		ItemStack purchase = null;
 		for (ItemStack itemStack : chestInv.getStorageContents()) {
 			if (itemStack == null) continue;
