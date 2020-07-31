@@ -54,12 +54,12 @@ public class InteractListener implements Listener {
 		}
 		
 		// Get container inventory
-		Inventory chestInv = ((Chest)SB.getBehindBlock(block).getState()).getBlockInventory();
+		Inventory containerInv = ((Chest)SB.getBehindBlock(block).getState()).getBlockInventory();
 		
 		// Does the container behind this sign have enough to give?
 		boolean isStocked = false;
 		int foundAmount = 0;
-		for (ItemStack itemStack : chestInv.getStorageContents()) {
+		for (ItemStack itemStack : containerInv.getStorageContents()) {
 			if (itemStack == null) continue;
 			if (itemStack.getType() != sellingItemAndQuantity.item) {
 				isStocked = false;
@@ -91,7 +91,7 @@ public class InteractListener implements Listener {
 		
 		// Find purchase in container
 		ItemStack purchase = null;
-		for (ItemStack itemStack : chestInv.getStorageContents()) {
+		for (ItemStack itemStack : containerInv.getStorageContents()) {
 			if (itemStack == null) continue;
 			if (itemStack.getType() == sellingItemAndQuantity.item) {
 				purchase = new ItemStack(itemStack);
@@ -101,8 +101,8 @@ public class InteractListener implements Listener {
 		}
 		
 		playerInv.removeItem(payment); // Take payment
-		chestInv.addItem(payment);     // Store payment in container		
-		chestInv.removeItem(purchase); // Take purchase from container
+		containerInv.addItem(payment);     // Store payment in container		
+		containerInv.removeItem(purchase); // Take purchase from container
 		playerInv.addItem(purchase);   // Give purchase to player
 		
 		e.getPlayer().sendMessage(SB.messagePrefix + "Item(s) received");
