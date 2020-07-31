@@ -15,7 +15,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-public class SignInteractListener implements Listener {
+public class InteractListener implements Listener {
 
 	@EventHandler
 	public void onSignInteractedWith(PlayerInteractEvent e) {

@@ -18,7 +18,7 @@ public class Main extends JavaPlugin {
 		//this.getCommand("report").setExecutor(new CommandReport());
 		PluginManager pluginManager = getServer().getPluginManager();
 		pluginManager.registerEvents(new SignEditListener(), this);
-		pluginManager.registerEvents(new SignInteractListener(), this);
+		pluginManager.registerEvents(new InteractListener(), this);
 	}
 	
 	@Override
