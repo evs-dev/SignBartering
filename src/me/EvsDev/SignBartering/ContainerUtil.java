@@ -1,8 +1,8 @@
 package me.EvsDev.SignBartering;
 
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.BlockData;
@@ -21,21 +21,18 @@ public class ContainerUtil {
 	}
 	
 	public static final Block findSurroundingSellingSignBlock(Block startBlock) {
-		Location blockLocation = startBlock.getLocation();
-		Location[] surroundingLocations = {
-			blockLocation.add(1, 0, 0),
-			blockLocation.add(0, 0, 1),
-			blockLocation.subtract(1, 0, 0),
-			blockLocation.subtract(0, 0, 1)
+		Block[] surroundingBlocks = {
+			startBlock.getRelative(BlockFace.NORTH),
+			startBlock.getRelative(BlockFace.EAST),
+			startBlock.getRelative(BlockFace.SOUTH),
+			startBlock.getRelative(BlockFace.WEST),
 		};
-		for (Location location : surroundingLocations) {
-			Block block = location.getBlock();
+		for (Block block: surroundingBlocks) {
+			if (!SB.isWallSign(block.getType())) continue;
 			
-			if (SB.isWallSign(block.getType())) { 
-				Sign sign = (Sign) block.getState();
-				if (LineChecker.perfectFirstLine(sign.getLine(0))) {
-					return block;
-				}
+			Sign sign = (Sign) block.getState();
+			if (LineChecker.perfectFirstLine(sign.getLine(0))) {
+				return block;
 			}
 		}
 		return null;
