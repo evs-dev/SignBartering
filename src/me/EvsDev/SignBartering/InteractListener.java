@@ -18,7 +18,7 @@ import org.bukkit.inventory.PlayerInventory;
 public class InteractListener implements Listener {
 
 	@EventHandler
-	public void onSignInteractedWith(PlayerInteractEvent e) {
+	public void onSignOrContainerInteractedWith(PlayerInteractEvent e) {
 		if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getHand() != EquipmentSlot.HAND) return;
 		
 		Block block = e.getClickedBlock();
