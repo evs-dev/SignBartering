@@ -36,9 +36,11 @@ public class SignEditListener implements Listener {
 			return;
 		}
 		
-		// Is it on a chest?
-        if (!SB.isWallSign(e.getBlock().getType()) || !SB.isChest(SB.getBehindBlock(e.getBlock()))) {
-        	SB.error(e, "Sign must be placed on the front of a chest (other containers do not currently work)");
+		// Is it on a container?
+        if (!SB.isWallSign(e.getBlock().getType()) ||
+        	!ContainerUtil.isBlockStateContainer(SB.getBehindBlock(e.getBlock()).getState())) {
+        	
+        	SB.error(e, "Sign must be placed on a container");
 			return;
         }
 		
