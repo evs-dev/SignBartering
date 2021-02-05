@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.inventory.ItemStack;
 
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -21,7 +22,7 @@ public class SignEditListener implements Listener {
         String[] lines = e.getLines();
 
         // Line 2
-        ItemAndQuantity sellingItemAndQuantity = LineChecker.parseItemAndQuantityLine(lines[1]);
+        ItemStack sellingItemAndQuantity = LineChecker.parseItemAndQuantityLine(lines[1], SB.itemQuantitySeparator);
 
         if (sellingItemAndQuantity == null) {
             SB.error(e, "Error on line 2");
@@ -29,7 +30,7 @@ public class SignEditListener implements Listener {
         }
 
         // Line 3
-        ItemAndQuantity priceItemAndQuantity = LineChecker.parseItemAndQuantityLine(lines[2]);
+        ItemStack priceItemAndQuantity = LineChecker.parseItemAndQuantityLine(lines[2], SB.itemQuantitySeparator);
 
         if (priceItemAndQuantity == null) {
             SB.error(e, "Error on line 3");
@@ -52,18 +53,18 @@ public class SignEditListener implements Listener {
         e.setLine(
                 1,
                 ChatColor.WHITE
-                + SB.cleanName(sellingItemAndQuantity.item.toString())
+                + SB.cleanName(sellingItemAndQuantity.getType().toString())
                 + SB.formattedItemQuantitySeparator
-                + Integer.toString(sellingItemAndQuantity.quantity)
+                + Integer.toString(sellingItemAndQuantity.getAmount())
                 );
 
         // Format third line
         e.setLine(
                 2,
                 ChatColor.WHITE
-                + SB.cleanName(priceItemAndQuantity.item.toString())
+                + SB.cleanName(priceItemAndQuantity.getType().toString())
                 + SB.formattedItemQuantitySeparator
-                + Integer.toString(priceItemAndQuantity.quantity)
+                + Integer.toString(priceItemAndQuantity.getAmount())
                 );
 
         // Put player name on last line
@@ -93,10 +94,10 @@ public class SignEditListener implements Listener {
                 (int)Math.floor(playerLocation.getX()),
                 (int)Math.floor(playerLocation.getY()),
                 (int)Math.floor(playerLocation.getZ()),
-                SB.cleanName(sellingItemAndQuantity.item.toString()),
-                Integer.toString(sellingItemAndQuantity.quantity),
-                SB.cleanName(priceItemAndQuantity.item.toString()),
-                Integer.toString(priceItemAndQuantity.quantity)
+                SB.cleanName(sellingItemAndQuantity.getType().toString()),
+                Integer.toString(sellingItemAndQuantity.getAmount()),
+                SB.cleanName(priceItemAndQuantity.getType().toString()),
+                Integer.toString(priceItemAndQuantity.getAmount())
                 );
 
         TextComponent message = new TextComponent("[Click to Announce]");

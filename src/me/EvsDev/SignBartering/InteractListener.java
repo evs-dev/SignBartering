@@ -14,6 +14,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import me.EvsDev.SignBartering.BarteringSign.BarteringSignCreationException;
 import net.md_5.bungee.api.ChatColor;
 
 public class InteractListener implements Listener {
@@ -24,36 +25,42 @@ public class InteractListener implements Listener {
 
         Block block = e.getClickedBlock();
 
-        // Is container
         if (ContainerUtil.isBlockStateContainer(block.getState())) {
-            Block signBlock = ContainerUtil.findSurroundingSellingSignBlock(block);
+            onContainerInteractedWith(e);
+        } else if (SB.isWallSign(block.getType())) {
+            onSignInteractedWith(e);
+        }
+    }
 
-            if (signBlock == null) return;
+    private void onContainerInteractedWith(PlayerInteractEvent e) {
+        Block signBlock = ContainerUtil.findSurroundingSellingSignBlock(e.getClickedBlock());
 
-            if (!SB.playerIsSignOwner((Sign) signBlock.getState(), e.getPlayer())) {
-                SB.error(e, "You cannot open this container as you are not the owner of this shop");
-                e.setCancelled(true);
-            }
+        if (signBlock == null) return;
 
-            return;
+        if (!SB.playerIsSignOwner((Sign) signBlock.getState(), e.getPlayer())) {
+            SB.error(e, "You cannot open this container as you are not the owner of this shop");
+            e.setCancelled(true);
         }
 
-        // Is sign
-        if (!SB.isWallSign(block.getType())) return;
+        return;
+    }
 
+    private void onSignInteractedWith(PlayerInteractEvent e) {
+        Block block = e.getClickedBlock();
         // Is [Selling] sign
         Sign sign = (Sign) block.getState();
-        if (!LineChecker.perfectFirstLine(sign.getLine(0))) return;
+
+        BarteringSign barteringSign;
+        try {
+            barteringSign = new BarteringSign(sign);
+        } catch (BarteringSignCreationException error) {
+            return;
+        }
 
         String[] lines = sign.getLines();
 
-        ItemAndQuantity sellingItemAndQuantity = LineChecker.parseItemAndQuantityLine(lines[1], true);
-        ItemAndQuantity priceItemAndQuantity = LineChecker.parseItemAndQuantityLine(lines[2], true);
-
-        if (sellingItemAndQuantity == null || priceItemAndQuantity == null) {
-            SB.error(e, "This sign is not a valid SignBartering sign (something is wrong with it)");
-            return;
-        }
+        ItemStack sellingItemStack = barteringSign.getSellingItemStack();
+        //SB.error(e, "This sign is not a valid SignBartering sign (something is wrong with it)");
 
         // Get container inventory
         Inventory containerInv = ((InventoryHolder)SB.getBehindBlock(block).getState()).getInventory();
@@ -63,14 +70,14 @@ public class InteractListener implements Listener {
         int foundAmount = 0;
         for (ItemStack itemStack : containerInv.getStorageContents()) {
             if (itemStack == null) continue;
-            if (itemStack.getType() != sellingItemAndQuantity.item) {
+            if (itemStack.getType() != sellingItemStack.getType()) {
                 isStocked = false;
-            } else if (itemStack.getAmount() >= sellingItemAndQuantity.quantity) {
+            } else if (itemStack.getAmount() >= sellingItemStack.getAmount()) {
                 isStocked = true;
                 break;
             } else {
                 foundAmount += itemStack.getAmount();
-                if (foundAmount >= sellingItemAndQuantity.quantity) {
+                if (foundAmount >= sellingItemStack.getAmount()) {
                     isStocked = true;
                     break;
                 }
@@ -78,14 +85,14 @@ public class InteractListener implements Listener {
         }
         if (!isStocked) {
             String appendix;
-            Player owner = SB.getSignOwner(lines[3]);
+            Player owner = barteringSign.getSignOwner();
             if (owner != null) {
                 Location blockLocation = block.getLocation();
                 String noStockMessage = String.format(
                         "%s tried to purchase [%s]x%s from your shop at X: %s Y: %s Z: %s but it is out of stock",
                         e.getPlayer().getDisplayName(),
-                        SB.cleanName(sellingItemAndQuantity.item.toString()),
-                        Integer.toString(sellingItemAndQuantity.quantity),
+                        SB.cleanName(sellingItemStack.getType().toString()),
+                        Integer.toString(sellingItemStack.getAmount()),
                         blockLocation.getBlockX(),
                         blockLocation.getBlockY(),
                         blockLocation.getBlockZ()
@@ -102,7 +109,7 @@ public class InteractListener implements Listener {
 
         // Get player and payment info
         PlayerInventory playerInv = e.getPlayer().getInventory();
-        ItemStack payment = new ItemStack(priceItemAndQuantity.item, priceItemAndQuantity.quantity);
+        ItemStack payment = barteringSign.getPriceItemStack();
 
         // Does the player have enough payment?
         if (!playerInv.containsAtLeast(payment, 1)) {
@@ -114,9 +121,9 @@ public class InteractListener implements Listener {
         ItemStack purchase = null;
         for (ItemStack itemStack : containerInv.getStorageContents()) {
             if (itemStack == null) continue;
-            if (itemStack.getType() == sellingItemAndQuantity.item) {
+            if (itemStack.getType() == sellingItemStack.getType()) {
                 purchase = new ItemStack(itemStack);
-                purchase.setAmount(sellingItemAndQuantity.quantity);
+                purchase.setAmount(sellingItemStack.getAmount());
                 break;
             }
         }
@@ -128,19 +135,18 @@ public class InteractListener implements Listener {
 
         e.getPlayer().sendMessage(SB.messagePrefix + "Item(s) received");
 
-        Player owner = SB.getSignOwner(lines[3]);
+        Player owner = barteringSign.getSignOwner();
         if (owner == null) return;
 
         String buyAlert = String.format("%s bought [%s]x%s for [%s]x%s from your shop!",
-                e.getPlayer().getDisplayName(),
-                SB.cleanName(sellingItemAndQuantity.item.toString()),
-                Integer.toString(sellingItemAndQuantity.quantity),
-                SB.cleanName(priceItemAndQuantity.item.toString()),
-                Integer.toString(priceItemAndQuantity.quantity)
-                );
+            e.getPlayer().getDisplayName(),
+            SB.cleanName(sellingItemStack.getType().toString()),
+            Integer.toString(sellingItemStack.getAmount()),
+            SB.cleanName(payment.getType().toString()),
+            Integer.toString(payment.getAmount())
+        );
 
         owner.sendMessage(SB.messagePrefix + buyAlert);
     }
-
 
 }

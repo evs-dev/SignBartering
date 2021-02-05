@@ -1,12 +1,13 @@
 package me.EvsDev.SignBartering;
 
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 import net.md_5.bungee.api.ChatColor;
 
 public class LineChecker {
 
-    public static ItemAndQuantity parseItemAndQuantityLine(String line, String separator) {
+    public static ItemStack parseItemAndQuantityLine(String line, String separator) {
         String[] split = ChatColor.stripColor(line).split(separator);
         if (split.length != 2) return null;
 
@@ -16,23 +17,10 @@ public class LineChecker {
         int quantity = SB.tryParseInt(ChatColor.stripColor(split[1]));
         if (quantity <= 0) return null;
 
-        return new ItemAndQuantity(item, quantity);
-    }
-
-    public static ItemAndQuantity parseItemAndQuantityLine(String line) {
-        return parseItemAndQuantityLine(line, SB.itemQuantitySeparator);
-    }
-
-    public static ItemAndQuantity parseItemAndQuantityLine(String line, boolean useFormattedSeparator) {
-        if (useFormattedSeparator) {
-            return parseItemAndQuantityLine(line, SB.formattedItemQuantitySeparator);
-        } else {
-            return parseItemAndQuantityLine(line);
-        }
+        return new ItemStack(item, quantity);
     }
 
     public static boolean perfectFirstLine(String line) {
         return (line != null) && (ChatColor.stripColor(line).equals(SB.requiredFirstLine));
     }
-
 }
