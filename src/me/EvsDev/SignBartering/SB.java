@@ -18,13 +18,13 @@ import net.md_5.bungee.api.ChatColor;
 
 public class SB {
 
-    public static String messagePrefix = ChatColor.GOLD + "[SignBartering] " + ChatColor.RESET;
-    public static String requiredFirstLine = "[SELLING]";
-    public static String alternativeRequiredFirstLine = "[SELL]";
-    public static String formattedItemQuantitySeparator = "x";
-    public static String itemQuantitySeparator = ":";
+    public static final String messagePrefix = ChatColor.GOLD + "[SignBartering] " + ChatColor.RESET;
+    public static final String requiredFirstLine = "[SELLING]";
+    public static final String alternativeRequiredFirstLine = "[SELL]";
+    public static final String formattedItemQuantitySeparator = "x";
+    public static final String itemQuantitySeparator = ":";
 
-    public static String error_NoMoney = "You have insufficient funds";
+    public static final String error_NoMoney = "You have insufficient funds";
 
     public static int tryParseInt(String string) {
         try {
@@ -80,13 +80,7 @@ public class SB {
             Material.WARPED_WALL_SIGN
     };
 
-    private static List<Material> signMaterials = Arrays.asList(signMaterialsArr);
     private static List<Material> wallSignMaterials = Arrays.asList(wallSignMaterialsArr);
-
-    @Deprecated
-    public static boolean isSign(Material material) {
-        return signMaterials.contains(material);
-    }
 
     public static boolean isWallSign(Material material) {
         return wallSignMaterials.contains(material);
@@ -102,11 +96,6 @@ public class SB {
         BlockData data = block.getBlockData();
         Directional directional = (Directional)data;
         return block.getRelative(directional.getFacing());
-    }
-
-    @Deprecated
-    public static boolean isChest(Block block) {
-        return block.getType() == Material.CHEST;
     }
 
     public static boolean playerIsSignOwner(Sign sign, Player player) {
