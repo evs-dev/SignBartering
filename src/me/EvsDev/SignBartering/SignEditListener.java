@@ -1,6 +1,7 @@
 package me.EvsDev.SignBartering;
 
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -17,84 +18,102 @@ public class SignEditListener implements Listener {
 
     @EventHandler
     public void onSignChange(SignChangeEvent e) {
-        String line1 = e.getLine(0);
-        if (line1 == null || (!line1.equalsIgnoreCase(SBUtil.requiredFirstLine) && !line1.equalsIgnoreCase(SBUtil.alternativeRequiredFirstLine))) return;
-        String[] lines = e.getLines();
+        if (!validateFirstLine(e.getLine(0))) return;
 
-        // Line 2
-        ItemStack sellingItemAndQuantity = LineChecker.parseItemAndQuantityLine(lines[1], SBUtil.itemQuantitySeparator);
+        final Player player = e.getPlayer();
 
-        if (sellingItemAndQuantity == null) {
-            Errors.showUserError(Errors.INVALID_LINE, e.getPlayer(), 2);
+        if (!isSignOnContainer(e.getBlock())) {
+            Errors.showUserError(Errors.SIGN_NOT_ON_CONTAINER, player);
             return;
         }
 
-        // Line 3
-        ItemStack priceItemAndQuantity = LineChecker.parseItemAndQuantityLine(lines[2], SBUtil.itemQuantitySeparator);
+        final ItemStack sellingItemStack = LineChecker.parseItemAndQuantityLine(e.getLine(1), SBUtil.itemQuantitySeparator);
+        if (!validateItemStack(sellingItemStack, player, 2)) return;
 
-        if (priceItemAndQuantity == null) {
-            Errors.showUserError(Errors.INVALID_LINE, e.getPlayer(), 3);
-            return;
+        final ItemStack priceItemStack = LineChecker.parseItemAndQuantityLine(e.getLine(2), SBUtil.itemQuantitySeparator);
+        if (!validateItemStack(priceItemStack, player, 3)) return;
+
+        // Parse the (valid!) player's formatting into readable + InteractListener-parseable text
+        e.setLine(0, formatFirstLine());
+        e.setLine(1, formatItemStackLine(sellingItemStack));
+        e.setLine(2, formatItemStackLine(priceItemStack));
+        e.setLine(3, formatLastLine(player));
+
+        sendSetUpConfirmation(player);
+        sendClickToAnnounceMessage(player, sellingItemStack, priceItemStack);
+    }
+
+    private boolean validateFirstLine(String line) {
+        return line == null
+            || !(line.equalsIgnoreCase(SBUtil.requiredFirstLine) && line.equalsIgnoreCase(SBUtil.alternativeRequiredFirstLine));
+    }
+
+    private boolean validateItemStack(ItemStack itemStack, Player signMaker, int line) {
+        if (itemStack == null) {
+            Errors.showUserError(Errors.INVALID_LINE, signMaker, line);
+            return false;
         }
+        return true;
+    }
 
-        // Is it on a container?
-        if (!SBUtil.isWallSign(e.getBlock().getType())
-            || !SBUtil.isBlockStateContainer(SBUtil.getBehindBlock(e.getBlock()).getState())) {
+    private boolean isSignOnContainer(Block block) {
+        return (SBUtil.isWallSign(block.getType())
+            && SBUtil.isBlockStateContainer(SBUtil.getBehindBlock(block).getState()));
+    }
 
-            Errors.showUserError(Errors.SIGN_NOT_ON_CONTAINER, e.getPlayer());
-            return;
-        }
+    private String formatFirstLine() {
+        return ChatColor.GOLD + SBUtil.requiredFirstLine;
+    }
 
-        // --- Stuff that should happen only when the sign is formatted properly by the player
-        // Format first line
-        e.setLine(0, ChatColor.GOLD + SBUtil.requiredFirstLine);
+    private String formatLastLine(Player player) {
+        return ChatColor.GRAY + "(" + player.getDisplayName() + ")";
+    }
 
-        // Format second line
-        e.setLine(
-            1,
-            ChatColor.WHITE
-            + SBUtil.cleanName(sellingItemAndQuantity.getType().toString())
+    private String formatItemStackLine(ItemStack itemStack) {
+        return ChatColor.WHITE
+            + SBUtil.cleanName(itemStack.getType().toString())
             + SBUtil.formattedItemQuantitySeparator
-            + Integer.toString(sellingItemAndQuantity.getAmount())
-        );
+            + Integer.toString(itemStack.getAmount());
+    }
 
-        // Format third line
-        e.setLine(
-            2,
-            ChatColor.WHITE
-            + SBUtil.cleanName(priceItemAndQuantity.getType().toString())
-            + SBUtil.formattedItemQuantitySeparator
-            + Integer.toString(priceItemAndQuantity.getAmount())
-        );
-
-        // Put player name on last line
-        e.setLine(3, ChatColor.GRAY + "(" + e.getPlayer().getDisplayName() + ")");
-
-        // Send confirmation messages
-        Player player = e.getPlayer();
+    private void sendSetUpConfirmation(Player player) {
         player.sendMessage(Main.MESSAGE_PREFIX + ChatColor.GREEN + "Shop setup successfully!");
         player.sendMessage(Main.MESSAGE_PREFIX + "Make sure there is enough room in your chest for payment.");
+    }
 
-        Location playerLocation = player.getLocation();
-        String command;
-
-        command = String.format("/me just set up a new shop at X: %s Y: %s Z: %s selling [%s]x%s for [%s]x%s!",
-            (int)Math.floor(playerLocation.getX()),
-            (int)Math.floor(playerLocation.getY()),
-            (int)Math.floor(playerLocation.getZ()),
-            SBUtil.cleanName(sellingItemAndQuantity.getType().toString()),
-            Integer.toString(sellingItemAndQuantity.getAmount()),
-            SBUtil.cleanName(priceItemAndQuantity.getType().toString()),
-            Integer.toString(priceItemAndQuantity.getAmount())
-        );
-
+    private TextComponent createClickToAnnounceMessage(String command) {
         TextComponent message = new TextComponent("[Click to Announce]");
         message.setColor(ChatColor.LIGHT_PURPLE);
         message.setUnderlined(true);
         message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command));
-        message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Click to announce your shop to the server").color(ChatColor.WHITE).create()));
-        player.spigot().sendMessage(message);
+        message.setHoverEvent(
+            new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                new ComponentBuilder("Click to announce your shop to the server").color(ChatColor.WHITE).create()
+            )
+        );
+        return message;
     }
 
+    private String formatClickToAnnounceCommand(Location playerLocation, ItemStack selling, ItemStack price) {
+        return String.format("/me just set up a new shop at X: %s Y: %s Z: %s selling [%s]x%s for [%s]x%s!",
+            (int)Math.floor(playerLocation.getX()),
+            (int)Math.floor(playerLocation.getY()),
+            (int)Math.floor(playerLocation.getZ()),
+            SBUtil.cleanName(selling.getType().toString()),
+            Integer.toString(selling.getAmount()),
+            SBUtil.cleanName(price.getType().toString()),
+            Integer.toString(price.getAmount())
+        );
+    }
+
+    private void sendClickToAnnounceMessage(Player player, ItemStack selling, ItemStack price) {
+        player.spigot().sendMessage(
+            createClickToAnnounceMessage(
+                formatClickToAnnounceCommand(
+                    player.getLocation(), selling, price
+                )
+            )
+        );
+    }
 
 }
