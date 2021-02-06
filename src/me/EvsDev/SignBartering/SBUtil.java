@@ -15,7 +15,7 @@ import org.bukkit.inventory.InventoryHolder;
 
 import net.md_5.bungee.api.ChatColor;
 
-public class SBUtil {
+public final class SBUtil {
 
     private final static List<Material> wallSignMaterials = Arrays.asList(
         Material.ACACIA_WALL_SIGN,
@@ -27,6 +27,13 @@ public class SBUtil {
         Material.SPRUCE_WALL_SIGN,
         Material.WARPED_WALL_SIGN
     );
+
+    private final static BlockFace[] horizontalBlockFaces = {
+        BlockFace.NORTH,
+        BlockFace.EAST,
+        BlockFace.SOUTH,
+        BlockFace.WEST
+    };
 
     public static int tryParseInt(String string) {
         try {
@@ -50,33 +57,21 @@ public class SBUtil {
         return block.getRelative(directional.getFacing().getOppositeFace());
     }
 
-    public static Block getInFrontBlock(Block block) {
-        BlockData data = block.getBlockData();
-        Directional directional = (Directional)data;
-        return block.getRelative(directional.getFacing());
-    }
-
-    public static String removeBracketsFromNameLine(String line) {
+    public static String removeBracketsFromSignLine(String line) {
         return ChatColor.stripColor(line.replace("(", "").replace(")", ""));
     }
 
-    public static boolean isBlockStateContainer(BlockState blockState) {
+    public static boolean isContainer(BlockState blockState) {
         return (blockState instanceof InventoryHolder);
     }
 
-    public static Block findSurroundingSellingSignBlock(Block startBlock) {
-        Block[] surroundingBlocks = {
-            startBlock.getRelative(BlockFace.NORTH),
-            startBlock.getRelative(BlockFace.EAST),
-            startBlock.getRelative(BlockFace.SOUTH),
-            startBlock.getRelative(BlockFace.WEST),
-        };
-        for (Block block : surroundingBlocks) {
-            if (!isWallSign(block.getType())) continue;
+    public static Sign findAttachedBarteringSign(Block startBlock) {
+        for (BlockFace face : horizontalBlockFaces) {
+            final Block block = startBlock.getRelative(face);
 
-            Sign sign = (Sign) block.getState();
-            if (LineChecker.perfectFirstLine(sign.getLine(0))) {
-                return block;
+            if (isWallSign(block.getType())) {
+                final Sign sign = (Sign) block.getState();
+                if (LineChecker.perfectFirstLine(sign.getLine(0))) return sign;
             }
         }
         return null;

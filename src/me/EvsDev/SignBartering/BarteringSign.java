@@ -36,7 +36,7 @@ public class BarteringSign {
     }
 
     public static boolean playerIsSignOwner(Player player, Sign sign) {
-        String signName = SBUtil.removeBracketsFromNameLine(sign.getLine(3));
+        String signName = SBUtil.removeBracketsFromSignLine(sign.getLine(3));
         return signName.equals(player.getDisplayName());
     }
 
@@ -46,7 +46,7 @@ public class BarteringSign {
     }
 
     private static Player getOwnerFromLine(String ownerLine) {
-        String ownerName = SBUtil.removeBracketsFromNameLine(ownerLine);
+        String ownerName = SBUtil.removeBracketsFromSignLine(ownerLine);
         return Bukkit.getPlayer(ownerName);
     }
 

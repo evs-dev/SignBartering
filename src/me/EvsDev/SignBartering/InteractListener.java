@@ -27,7 +27,7 @@ public class InteractListener implements Listener {
 
         Block block = e.getClickedBlock();
 
-        if (SBUtil.isBlockStateContainer(block.getState())) {
+        if (SBUtil.isContainer(block.getState())) {
             onContainerInteractedWith(e);
         } else if (SBUtil.isWallSign(block.getType())) {
             onSignInteractedWith(e);
@@ -35,11 +35,11 @@ public class InteractListener implements Listener {
     }
 
     private void onContainerInteractedWith(PlayerInteractEvent e) {
-        Block signBlock = SBUtil.findSurroundingSellingSignBlock(e.getClickedBlock());
+        final Sign surroundingSign = SBUtil.findAttachedBarteringSign(e.getClickedBlock());
 
-        if (signBlock == null) return;
+        if (surroundingSign == null) return;
 
-        if (!BarteringSign.playerIsSignOwner(e.getPlayer(), (Sign) signBlock.getState())) {
+        if (!BarteringSign.playerIsSignOwner(e.getPlayer(), surroundingSign)) {
             Errors.showUserError(Errors.NOT_THE_OWNER, e.getPlayer());
             e.setCancelled(true);
         }

@@ -57,7 +57,7 @@ public class SignEditListener implements Listener {
 
     private boolean isSignOnContainer(Block block) {
         return (SBUtil.isWallSign(block.getType())
-            && SBUtil.isBlockStateContainer(SBUtil.getBehindBlock(block).getState()));
+            && SBUtil.isContainer(SBUtil.getBehindBlock(block).getState()));
     }
 
     private String formatFirstLine() {
