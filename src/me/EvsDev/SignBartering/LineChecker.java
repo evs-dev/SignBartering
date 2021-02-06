@@ -14,13 +14,13 @@ public class LineChecker {
         Material item = Material.matchMaterial(ChatColor.stripColor(split[0]));
         if (item == null) return null;
 
-        int quantity = SB.tryParseInt(ChatColor.stripColor(split[1]));
+        int quantity = SBUtil.tryParseInt(ChatColor.stripColor(split[1]));
         if (quantity <= 0) return null;
 
         return new ItemStack(item, quantity);
     }
 
     public static boolean perfectFirstLine(String line) {
-        return (line != null) && (ChatColor.stripColor(line).equals(SB.requiredFirstLine));
+        return (line != null) && (ChatColor.stripColor(line).equals(SBUtil.requiredFirstLine));
     }
 }

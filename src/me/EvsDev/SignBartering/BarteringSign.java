@@ -13,9 +13,9 @@ public class BarteringSign {
         if (!LineChecker.perfectFirstLine(sign.getLine(0))) throw new BarteringSignCreationException();
         this.sign = sign;
         this.location = sign.getLocation();
-        sellingItemStack = LineChecker.parseItemAndQuantityLine(sign.getLine(1), SB.formattedItemQuantitySeparator);
+        sellingItemStack = LineChecker.parseItemAndQuantityLine(sign.getLine(1), SBUtil.formattedItemQuantitySeparator);
         if (sellingItemStack == null) throw new BarteringSignCreationException(Errors.INVALID_SELLING_SIGN);
-        priceItemStack = LineChecker.parseItemAndQuantityLine(sign.getLine(2), SB.formattedItemQuantitySeparator);
+        priceItemStack = LineChecker.parseItemAndQuantityLine(sign.getLine(2), SBUtil.formattedItemQuantitySeparator);
         if (priceItemStack == null) throw new BarteringSignCreationException(Errors.INVALID_SELLING_SIGN);
         this.signOwner = getOwnerFromLine(sign.getLine(3));
         if (signOwner == null) throw new BarteringSignCreationException(Errors.INVALID_SELLING_SIGN);
@@ -40,7 +40,7 @@ public class BarteringSign {
     }
 
     public static boolean playerIsSignOwner(Player player, Sign sign) {
-        String signName = SB.removeBracketsFromNameLine(sign.getLine(3));
+        String signName = SBUtil.removeBracketsFromNameLine(sign.getLine(3));
         return signName.equals(player.getDisplayName());
     }
 
@@ -50,7 +50,7 @@ public class BarteringSign {
     }
 
     private static Player getOwnerFromLine(String ownerLine) {
-        String ownerName = SB.removeBracketsFromNameLine(ownerLine);
+        String ownerName = SBUtil.removeBracketsFromNameLine(ownerLine);
         return Bukkit.getPlayer(ownerName);
     }
 

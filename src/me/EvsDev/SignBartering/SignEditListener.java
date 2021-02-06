@@ -18,11 +18,11 @@ public class SignEditListener implements Listener {
     @EventHandler
     public void onSignChange(SignChangeEvent e) {
         String line1 = e.getLine(0);
-        if (line1 == null || (!line1.equalsIgnoreCase(SB.requiredFirstLine) && !line1.equalsIgnoreCase(SB.alternativeRequiredFirstLine))) return;
+        if (line1 == null || (!line1.equalsIgnoreCase(SBUtil.requiredFirstLine) && !line1.equalsIgnoreCase(SBUtil.alternativeRequiredFirstLine))) return;
         String[] lines = e.getLines();
 
         // Line 2
-        ItemStack sellingItemAndQuantity = LineChecker.parseItemAndQuantityLine(lines[1], SB.itemQuantitySeparator);
+        ItemStack sellingItemAndQuantity = LineChecker.parseItemAndQuantityLine(lines[1], SBUtil.itemQuantitySeparator);
 
         if (sellingItemAndQuantity == null) {
             Errors.showUserError(Errors.INVALID_LINE, e.getPlayer(), 2);
@@ -30,7 +30,7 @@ public class SignEditListener implements Listener {
         }
 
         // Line 3
-        ItemStack priceItemAndQuantity = LineChecker.parseItemAndQuantityLine(lines[2], SB.itemQuantitySeparator);
+        ItemStack priceItemAndQuantity = LineChecker.parseItemAndQuantityLine(lines[2], SBUtil.itemQuantitySeparator);
 
         if (priceItemAndQuantity == null) {
             Errors.showUserError(Errors.INVALID_LINE, e.getPlayer(), 3);
@@ -38,8 +38,8 @@ public class SignEditListener implements Listener {
         }
 
         // Is it on a container?
-        if (!SB.isWallSign(e.getBlock().getType()) ||
-                !SB.isBlockStateContainer(SB.getBehindBlock(e.getBlock()).getState())) {
+        if (!SBUtil.isWallSign(e.getBlock().getType()) ||
+                !SBUtil.isBlockStateContainer(SBUtil.getBehindBlock(e.getBlock()).getState())) {
 
             Errors.showUserError(Errors.SIGN_NOT_ON_CONTAINER, e.getPlayer());
             return;
@@ -47,14 +47,14 @@ public class SignEditListener implements Listener {
 
         // --- Stuff that should happen only when the sign is formatted properly by the player
         // Format first line
-        e.setLine(0, ChatColor.GOLD + SB.requiredFirstLine);
+        e.setLine(0, ChatColor.GOLD + SBUtil.requiredFirstLine);
 
         // Format second line
         e.setLine(
                 1,
                 ChatColor.WHITE
-                + SB.cleanName(sellingItemAndQuantity.getType().toString())
-                + SB.formattedItemQuantitySeparator
+                + SBUtil.cleanName(sellingItemAndQuantity.getType().toString())
+                + SBUtil.formattedItemQuantitySeparator
                 + Integer.toString(sellingItemAndQuantity.getAmount())
                 );
 
@@ -62,8 +62,8 @@ public class SignEditListener implements Listener {
         e.setLine(
                 2,
                 ChatColor.WHITE
-                + SB.cleanName(priceItemAndQuantity.getType().toString())
-                + SB.formattedItemQuantitySeparator
+                + SBUtil.cleanName(priceItemAndQuantity.getType().toString())
+                + SBUtil.formattedItemQuantitySeparator
                 + Integer.toString(priceItemAndQuantity.getAmount())
                 );
 
@@ -94,9 +94,9 @@ public class SignEditListener implements Listener {
                 (int)Math.floor(playerLocation.getX()),
                 (int)Math.floor(playerLocation.getY()),
                 (int)Math.floor(playerLocation.getZ()),
-                SB.cleanName(sellingItemAndQuantity.getType().toString()),
+                SBUtil.cleanName(sellingItemAndQuantity.getType().toString()),
                 Integer.toString(sellingItemAndQuantity.getAmount()),
-                SB.cleanName(priceItemAndQuantity.getType().toString()),
+                SBUtil.cleanName(priceItemAndQuantity.getType().toString()),
                 Integer.toString(priceItemAndQuantity.getAmount())
                 );
 

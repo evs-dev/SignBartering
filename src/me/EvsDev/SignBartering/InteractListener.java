@@ -25,15 +25,15 @@ public class InteractListener implements Listener {
 
         Block block = e.getClickedBlock();
 
-        if (SB.isBlockStateContainer(block.getState())) {
+        if (SBUtil.isBlockStateContainer(block.getState())) {
             onContainerInteractedWith(e);
-        } else if (SB.isWallSign(block.getType())) {
+        } else if (SBUtil.isWallSign(block.getType())) {
             onSignInteractedWith(e);
         }
     }
 
     private void onContainerInteractedWith(PlayerInteractEvent e) {
-        Block signBlock = SB.findSurroundingSellingSignBlock(e.getClickedBlock());
+        Block signBlock = SBUtil.findSurroundingSellingSignBlock(e.getClickedBlock());
 
         if (signBlock == null) return;
 
@@ -64,7 +64,7 @@ public class InteractListener implements Listener {
         //SB.error(e, "This sign is not a valid SignBartering sign (something is wrong with it)");
 
         // Get container inventory
-        Inventory containerInv = ((InventoryHolder)SB.getBehindBlock(block).getState()).getInventory();
+        Inventory containerInv = ((InventoryHolder)SBUtil.getBehindBlock(block).getState()).getInventory();
 
         // Does the container behind this sign have enough to give?
         boolean isStocked = false;
@@ -91,7 +91,7 @@ public class InteractListener implements Listener {
                 Location blockLocation = block.getLocation();
                 Errors.showUserError(Errors.OWNERS_SHOP_OUT_OF_STOCK, owner,
                     e.getPlayer().getDisplayName(),
-                    SB.cleanName(sellingItemStack.getType().toString()),
+                    SBUtil.cleanName(sellingItemStack.getType().toString()),
                     Integer.toString(sellingItemStack.getAmount()),
                     blockLocation.getBlockX(),
                     blockLocation.getBlockY(),
@@ -139,9 +139,9 @@ public class InteractListener implements Listener {
 
         String buyAlert = String.format("%s bought [%s]x%s for [%s]x%s from your shop!",
             e.getPlayer().getDisplayName(),
-            SB.cleanName(sellingItemStack.getType().toString()),
+            SBUtil.cleanName(sellingItemStack.getType().toString()),
             Integer.toString(sellingItemStack.getAmount()),
-            SB.cleanName(payment.getType().toString()),
+            SBUtil.cleanName(payment.getType().toString()),
             Integer.toString(payment.getAmount())
         );
 

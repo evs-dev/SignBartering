@@ -15,7 +15,7 @@ import org.bukkit.inventory.InventoryHolder;
 
 import net.md_5.bungee.api.ChatColor;
 
-public class SB {
+public class SBUtil {
 
     public static final String requiredFirstLine = "[SELLING]";
     public static final String alternativeRequiredFirstLine = "[SELL]";
