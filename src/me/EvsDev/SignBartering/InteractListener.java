@@ -150,18 +150,17 @@ public class InteractListener implements Listener {
     }
 
     private List<ItemStack> findPurchaseInContainer(Inventory inventory, ItemStack selling) {
-        List<ItemStack> purchase = new ArrayList<>();
+        final List<ItemStack> purchase = new ArrayList<>();
+        int currentTotalNumberOfPurchasedItems = 0;
         for (ItemStack itemStack : inventory.getStorageContents()) {
             if (itemStack == null) continue;
             if (itemStack.getType() == selling.getType()) {
-                int currentTotalNumberOfPurchasedItems = 0;
-                for (ItemStack purchased : purchase) {
-                    currentTotalNumberOfPurchasedItems += purchased.getAmount();
-                }
                 if (currentTotalNumberOfPurchasedItems < selling.getAmount()) {
-                    ItemStack toAdd = new ItemStack(itemStack);
-                    toAdd.setAmount(Math.min(selling.getAmount() - currentTotalNumberOfPurchasedItems, itemStack.getAmount()));
+                    final ItemStack toAdd = new ItemStack(itemStack);
+                    final int amount = Math.min(selling.getAmount() - currentTotalNumberOfPurchasedItems, itemStack.getAmount());
+                    toAdd.setAmount(amount);
                     purchase.add(toAdd);
+                    currentTotalNumberOfPurchasedItems += amount;
                 } else {
                     break;
                 }
