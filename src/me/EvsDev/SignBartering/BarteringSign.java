@@ -1,5 +1,6 @@
 package me.EvsDev.SignBartering;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
@@ -16,11 +17,9 @@ public class BarteringSign {
         if (sellingItemStack == null) throw new BarteringSignCreationException(Errors.INVALID_SELLING_SIGN);
         priceItemStack = LineChecker.parseItemAndQuantityLine(sign.getLine(2), SB.formattedItemQuantitySeparator);
         if (priceItemStack == null) throw new BarteringSignCreationException(Errors.INVALID_SELLING_SIGN);
-        this.signOwner = SB.getSignOwner(sign.getLine(3));
+        this.signOwner = getOwnerFromLine(sign.getLine(3));
         if (signOwner == null) throw new BarteringSignCreationException(Errors.INVALID_SELLING_SIGN);
     }
-
-
 
     private final Sign sign;
     private final Location location;
@@ -43,6 +42,11 @@ public class BarteringSign {
     public boolean playerIsSignOwner(Player player) {
         String signName = SB.removeBracketsFromNameLine(signOwner.getDisplayName());
         return signName.equals(player.getDisplayName());
+    }
+
+    private static Player getOwnerFromLine(String ownerLine) {
+        String ownerName = SB.removeBracketsFromNameLine(ownerLine);
+        return Bukkit.getPlayer(ownerName);
     }
 
     public class BarteringSignCreationException extends Exception {

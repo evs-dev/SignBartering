@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang.WordUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -90,12 +89,6 @@ public class SB {
 
     public static String removeBracketsFromNameLine(String line) {
         return ChatColor.stripColor(line.replace("(", "").replace(")", ""));
-    }
-
-    @Deprecated
-    public static Player getSignOwner(String ownerLine) {
-        String ownerName = SB.removeBracketsFromNameLine(ownerLine);
-        return Bukkit.getPlayer(ownerName);
     }
 
 }
