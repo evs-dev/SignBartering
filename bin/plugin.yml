@@ -1,6 +1,6 @@
 main: me.EvsDev.SignBartering.Main
 name: SignBartering
-version: 1.2.0
+version: 1.2.1
 description: "Easy and simple sign shops"
 author: EvsDev
 api-version: 1.16
