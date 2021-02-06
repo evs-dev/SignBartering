@@ -7,6 +7,9 @@ import net.md_5.bungee.api.ChatColor;
 
 public class LineChecker {
 
+    public static final String REQUIRED_FIRST_LINE = "[SELLING]";
+    public static final String ALTERNATIVE_REQUIRED_FIRST_LINE = "[SELL]";
+
     public static ItemStack parseItemAndQuantityLine(String line, String separator) {
         String[] split = ChatColor.stripColor(line).split(separator);
         if (split.length != 2) return null;
@@ -21,17 +24,14 @@ public class LineChecker {
     }
 
     public static boolean perfectFirstLine(String line) {
-        return (line != null) && (ChatColor.stripColor(line).equals(LineChecker.requiredFirstLine));
+        return (line != null) && (ChatColor.stripColor(line).equals(LineChecker.REQUIRED_FIRST_LINE));
     }
 
     public static boolean sufficientFirstLine(String line) {
         line = ChatColor.stripColor(line);
         return (line != null)
-            && (line.equalsIgnoreCase((LineChecker.requiredFirstLine))
-                    || line.equalsIgnoreCase((LineChecker.alternativeRequiredFirstLine))
+            && (line.equalsIgnoreCase((LineChecker.REQUIRED_FIRST_LINE))
+                    || line.equalsIgnoreCase((LineChecker.ALTERNATIVE_REQUIRED_FIRST_LINE))
                 );
     }
-
-    public static final String requiredFirstLine = "[SELLING]";
-    public static final String alternativeRequiredFirstLine = "[SELL]";
 }

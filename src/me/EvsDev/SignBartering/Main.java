@@ -8,8 +8,8 @@ import net.md_5.bungee.api.ChatColor;
 public class Main extends JavaPlugin {
 
     public static final String MESSAGE_PREFIX = ChatColor.GOLD + "[SignBartering] " + ChatColor.RESET;
-    public static final String itemQuantitySeparator = ":";
-    public static final String formattedItemQuantitySeparator = "x";
+    public static final String ITEM_QUANTITY_SEPARATOR = ":";
+    public static final String FORMATTED_ITEM_QUANTITY_SEPARATOR = "x";
 
     @Override
     public void onEnable() {
