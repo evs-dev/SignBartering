@@ -71,10 +71,10 @@ public class SBUtil {
 
     public static Block findSurroundingSellingSignBlock(Block startBlock) {
         Block[] surroundingBlocks = {
-                startBlock.getRelative(BlockFace.NORTH),
-                startBlock.getRelative(BlockFace.EAST),
-                startBlock.getRelative(BlockFace.SOUTH),
-                startBlock.getRelative(BlockFace.WEST),
+            startBlock.getRelative(BlockFace.NORTH),
+            startBlock.getRelative(BlockFace.EAST),
+            startBlock.getRelative(BlockFace.SOUTH),
+            startBlock.getRelative(BlockFace.WEST),
         };
         for (Block block : surroundingBlocks) {
             if (!isWallSign(block.getType())) continue;

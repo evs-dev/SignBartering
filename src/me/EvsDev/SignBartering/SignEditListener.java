@@ -38,8 +38,8 @@ public class SignEditListener implements Listener {
         }
 
         // Is it on a container?
-        if (!SBUtil.isWallSign(e.getBlock().getType()) ||
-                !SBUtil.isBlockStateContainer(SBUtil.getBehindBlock(e.getBlock()).getState())) {
+        if (!SBUtil.isWallSign(e.getBlock().getType())
+            || !SBUtil.isBlockStateContainer(SBUtil.getBehindBlock(e.getBlock()).getState())) {
 
             Errors.showUserError(Errors.SIGN_NOT_ON_CONTAINER, e.getPlayer());
             return;
@@ -51,54 +51,42 @@ public class SignEditListener implements Listener {
 
         // Format second line
         e.setLine(
-                1,
-                ChatColor.WHITE
-                + SBUtil.cleanName(sellingItemAndQuantity.getType().toString())
-                + SBUtil.formattedItemQuantitySeparator
-                + Integer.toString(sellingItemAndQuantity.getAmount())
-                );
+            1,
+            ChatColor.WHITE
+            + SBUtil.cleanName(sellingItemAndQuantity.getType().toString())
+            + SBUtil.formattedItemQuantitySeparator
+            + Integer.toString(sellingItemAndQuantity.getAmount())
+        );
 
         // Format third line
         e.setLine(
-                2,
-                ChatColor.WHITE
-                + SBUtil.cleanName(priceItemAndQuantity.getType().toString())
-                + SBUtil.formattedItemQuantitySeparator
-                + Integer.toString(priceItemAndQuantity.getAmount())
-                );
+            2,
+            ChatColor.WHITE
+            + SBUtil.cleanName(priceItemAndQuantity.getType().toString())
+            + SBUtil.formattedItemQuantitySeparator
+            + Integer.toString(priceItemAndQuantity.getAmount())
+        );
 
         // Put player name on last line
         e.setLine(3, ChatColor.GRAY + "(" + e.getPlayer().getDisplayName() + ")");
 
         // Send confirmation messages
         Player player = e.getPlayer();
-        player.sendMessage(
-                Main.MESSAGE_PREFIX + ChatColor.GREEN + "Shop setup successfully!"
-                );
-        player.sendMessage(
-                Main.MESSAGE_PREFIX + "Make sure there is enough room in your chest for payment."
-                );
+        player.sendMessage(Main.MESSAGE_PREFIX + ChatColor.GREEN + "Shop setup successfully!");
+        player.sendMessage(Main.MESSAGE_PREFIX + "Make sure there is enough room in your chest for payment.");
+
         Location playerLocation = player.getLocation();
         String command;
 
-        /*
-		command = String.format(
-				"/tellraw @a [\"\",{\"text\": \"[SignBartering] \", \"color\":\"gold\"}, {\"text\":\"%s just set up a new shop at X: %s Y: %s Z: %s selling [%s]!\",\"color\":\"green\"}]",
-				player.getDisplayName(),
-				(int)Math.floor(playerLocation.getX()),
-				(int)Math.floor(playerLocation.getY()),
-				(int)Math.floor(playerLocation.getZ()),
-				SB.cleanName(sellingItemAndQuantity.item.toString())
-		);*/
         command = String.format("/me just set up a new shop at X: %s Y: %s Z: %s selling [%s]x%s for [%s]x%s!",
-                (int)Math.floor(playerLocation.getX()),
-                (int)Math.floor(playerLocation.getY()),
-                (int)Math.floor(playerLocation.getZ()),
-                SBUtil.cleanName(sellingItemAndQuantity.getType().toString()),
-                Integer.toString(sellingItemAndQuantity.getAmount()),
-                SBUtil.cleanName(priceItemAndQuantity.getType().toString()),
-                Integer.toString(priceItemAndQuantity.getAmount())
-                );
+            (int)Math.floor(playerLocation.getX()),
+            (int)Math.floor(playerLocation.getY()),
+            (int)Math.floor(playerLocation.getZ()),
+            SBUtil.cleanName(sellingItemAndQuantity.getType().toString()),
+            Integer.toString(sellingItemAndQuantity.getAmount()),
+            SBUtil.cleanName(priceItemAndQuantity.getType().toString()),
+            Integer.toString(priceItemAndQuantity.getAmount())
+        );
 
         TextComponent message = new TextComponent("[Click to Announce]");
         message.setColor(ChatColor.LIGHT_PURPLE);

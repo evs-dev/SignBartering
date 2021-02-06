@@ -47,9 +47,9 @@ public class InteractListener implements Listener {
 
     private void onSignInteractedWith(PlayerInteractEvent e) {
         Block block = e.getClickedBlock();
-        // Is [Selling] sign
         Sign sign = (Sign) block.getState();
 
+        // Is [Selling] sign?
         BarteringSign barteringSign;
         try {
             barteringSign = new BarteringSign(sign);
@@ -60,11 +60,8 @@ public class InteractListener implements Listener {
 
         String[] lines = sign.getLines();
 
-        ItemStack sellingItemStack = barteringSign.getSellingItemStack();
-        //SB.error(e, "This sign is not a valid SignBartering sign (something is wrong with it)");
-
-        // Get container inventory
         Inventory containerInv = ((InventoryHolder)SBUtil.getBehindBlock(block).getState()).getInventory();
+        ItemStack sellingItemStack = barteringSign.getSellingItemStack();
 
         // Does the container behind this sign have enough to give?
         boolean isStocked = false;
@@ -84,9 +81,11 @@ public class InteractListener implements Listener {
                 }
             }
         }
+
         if (!isStocked) {
-            String appendix;
+            String appendix = "The shop owner " + lines[3] + ChatColor.RED;
             Player owner = barteringSign.getSignOwner();
+
             if (owner != null) {
                 Location blockLocation = block.getLocation();
                 Errors.showUserError(Errors.OWNERS_SHOP_OUT_OF_STOCK, owner,
@@ -96,21 +95,19 @@ public class InteractListener implements Listener {
                     blockLocation.getBlockX(),
                     blockLocation.getBlockY(),
                     blockLocation.getBlockZ()
-               );
-                appendix = "The shop owner " + lines[3] + ChatColor.RED + " has been notified";
+                );
+                appendix += " has been notified";
             } else {
-                appendix = "The shop owner " + lines[3] + ChatColor.RED + " could not be notified as they are offline";
+                appendix += " could not be notified as they are offline";
             }
-            Errors.showUserError(Errors.OUT_OF_STOCK, e.getPlayer(), appendix);
 
+            Errors.showUserError(Errors.OUT_OF_STOCK, e.getPlayer(), appendix);
             return;
         }
 
-        // Get player and payment info
         PlayerInventory playerInv = e.getPlayer().getInventory();
         ItemStack payment = barteringSign.getPriceItemStack();
 
-        // Does the player have enough payment?
         if (!playerInv.containsAtLeast(payment, 1)) {
             Errors.showUserError(Errors.INSUFFICIENT_FUNDS, e.getPlayer());
             return;
