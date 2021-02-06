@@ -19,6 +19,17 @@ public class SB {
     public static final String formattedItemQuantitySeparator = "x";
     public static final String itemQuantitySeparator = ":";
 
+    private final static List<Material> wallSignMaterials = Arrays.asList(
+        Material.ACACIA_WALL_SIGN,
+        Material.BIRCH_WALL_SIGN,
+        Material.CRIMSON_WALL_SIGN,
+        Material.DARK_OAK_WALL_SIGN,
+        Material.JUNGLE_WALL_SIGN,
+        Material.OAK_WALL_SIGN,
+        Material.SPRUCE_WALL_SIGN,
+        Material.WARPED_WALL_SIGN
+    );
+
     public static int tryParseInt(String string) {
         try {
             return Integer.parseInt(string);
@@ -30,38 +41,6 @@ public class SB {
     public static String cleanName(String name) {
         return WordUtils.capitalize(name.replace('_', ' ').toLowerCase());
     }
-
-    private static final Material[] signMaterialsArr = {
-            Material.ACACIA_SIGN,
-            Material.ACACIA_WALL_SIGN,
-            Material.BIRCH_SIGN,
-            Material.BIRCH_WALL_SIGN,
-            Material.CRIMSON_SIGN,
-            Material.CRIMSON_WALL_SIGN,
-            Material.DARK_OAK_SIGN,
-            Material.DARK_OAK_WALL_SIGN,
-            Material.JUNGLE_SIGN,
-            Material.JUNGLE_WALL_SIGN,
-            Material.OAK_SIGN,
-            Material.OAK_WALL_SIGN,
-            Material.SPRUCE_SIGN,
-            Material.SPRUCE_WALL_SIGN,
-            Material.WARPED_SIGN,
-            Material.WARPED_WALL_SIGN
-    };
-
-    private static final Material[] wallSignMaterialsArr = {
-            Material.ACACIA_WALL_SIGN,
-            Material.BIRCH_WALL_SIGN,
-            Material.CRIMSON_WALL_SIGN,
-            Material.DARK_OAK_WALL_SIGN,
-            Material.JUNGLE_WALL_SIGN,
-            Material.OAK_WALL_SIGN,
-            Material.SPRUCE_WALL_SIGN,
-            Material.WARPED_WALL_SIGN
-    };
-
-    private static List<Material> wallSignMaterials = Arrays.asList(wallSignMaterialsArr);
 
     public static boolean isWallSign(Material material) {
         return wallSignMaterials.contains(material);
