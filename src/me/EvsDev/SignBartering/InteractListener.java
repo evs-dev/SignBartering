@@ -21,7 +21,7 @@ public class InteractListener implements Listener {
 
     @EventHandler
     public void onSignOrContainerInteractedWith(PlayerInteractEvent e) {
-        if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getHand() != EquipmentSlot.HAND) return;
+        if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getHand() != EquipmentSlot.HAND || e.getPlayer().isSneaking()) return;
 
         Block block = e.getClickedBlock();
 
