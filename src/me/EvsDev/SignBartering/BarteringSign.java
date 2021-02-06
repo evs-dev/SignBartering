@@ -13,18 +13,14 @@ public class BarteringSign {
         this.sign = sign;
         this.location = sign.getLocation();
         sellingItemStack = LineChecker.parseItemAndQuantityLine(sign.getLine(1), SB.formattedItemQuantitySeparator);
-        if (sellingItemStack == null) throw new BarteringSignCreationException();
+        if (sellingItemStack == null) throw new BarteringSignCreationException(Errors.INVALID_SELLING_SIGN);
         priceItemStack = LineChecker.parseItemAndQuantityLine(sign.getLine(2), SB.formattedItemQuantitySeparator);
-        if (priceItemStack == null) throw new BarteringSignCreationException();
+        if (priceItemStack == null) throw new BarteringSignCreationException(Errors.INVALID_SELLING_SIGN);
         this.signOwner = SB.getSignOwner(sign.getLine(3));
-        if (signOwner == null) throw new BarteringSignCreationException();
+        if (signOwner == null) throw new BarteringSignCreationException(Errors.INVALID_SELLING_SIGN);
     }
 
-    public class BarteringSignCreationException extends Exception {
-        public BarteringSignCreationException() {
 
-        }
-    }
 
     private final Sign sign;
     private final Location location;
@@ -49,4 +45,23 @@ public class BarteringSign {
         return signName.equals(player.getDisplayName());
     }
 
+    public class BarteringSignCreationException extends Exception {
+        public BarteringSignCreationException() {
+            this.error = Errors.NONE;
+        }
+        public BarteringSignCreationException(Errors error) {
+            super(error.getErrorMessage());
+            this.error = error;
+        }
+        public BarteringSignCreationException(Errors lineError, int line) {
+            super(String.format(lineError.getErrorMessage(), line));
+            this.error = lineError;
+        }
+
+        private final Errors error;
+
+        public Errors getError() {
+            return error;
+        }
+    }
 }

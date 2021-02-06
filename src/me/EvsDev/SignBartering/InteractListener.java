@@ -38,7 +38,7 @@ public class InteractListener implements Listener {
         if (signBlock == null) return;
 
         if (!SB.playerIsSignOwner((Sign) signBlock.getState(), e.getPlayer())) {
-            SB.error(e, "You cannot open this container as you are not the owner of this shop");
+            Errors.showUserError(Errors.NOT_THE_OWNER, e.getPlayer());
             e.setCancelled(true);
         }
 
@@ -54,6 +54,7 @@ public class InteractListener implements Listener {
         try {
             barteringSign = new BarteringSign(sign);
         } catch (BarteringSignCreationException error) {
+            Errors.showUserError(error.getError(), e.getPlayer());
             return;
         }
 
@@ -88,21 +89,19 @@ public class InteractListener implements Listener {
             Player owner = barteringSign.getSignOwner();
             if (owner != null) {
                 Location blockLocation = block.getLocation();
-                String noStockMessage = String.format(
-                        "%s tried to purchase [%s]x%s from your shop at X: %s Y: %s Z: %s but it is out of stock",
-                        e.getPlayer().getDisplayName(),
-                        SB.cleanName(sellingItemStack.getType().toString()),
-                        Integer.toString(sellingItemStack.getAmount()),
-                        blockLocation.getBlockX(),
-                        blockLocation.getBlockY(),
-                        blockLocation.getBlockZ()
-                        );
-                SB.error(owner, noStockMessage);
+                Errors.showUserError(Errors.OWNERS_SHOP_OUT_OF_STOCK, owner,
+                    e.getPlayer().getDisplayName(),
+                    SB.cleanName(sellingItemStack.getType().toString()),
+                    Integer.toString(sellingItemStack.getAmount()),
+                    blockLocation.getBlockX(),
+                    blockLocation.getBlockY(),
+                    blockLocation.getBlockZ()
+               );
                 appendix = "The shop owner " + lines[3] + ChatColor.RED + " has been notified";
             } else {
                 appendix = "The shop owner " + lines[3] + ChatColor.RED + " could not be notified as they are offline";
             }
-            SB.error(e, "The shop is not currently stocked. " + appendix);
+            Errors.showUserError(Errors.OUT_OF_STOCK, e.getPlayer(), appendix);
 
             return;
         }
@@ -113,7 +112,7 @@ public class InteractListener implements Listener {
 
         // Does the player have enough payment?
         if (!playerInv.containsAtLeast(payment, 1)) {
-            SB.error(e, SB.error_NoMoney);
+            Errors.showUserError(Errors.INSUFFICIENT_FUNDS, e.getPlayer());
             return;
         }
 

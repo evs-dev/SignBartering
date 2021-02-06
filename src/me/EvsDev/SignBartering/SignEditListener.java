@@ -25,7 +25,7 @@ public class SignEditListener implements Listener {
         ItemStack sellingItemAndQuantity = LineChecker.parseItemAndQuantityLine(lines[1], SB.itemQuantitySeparator);
 
         if (sellingItemAndQuantity == null) {
-            SB.error(e, "Error on line 2");
+            Errors.showUserError(Errors.INVALID_LINE, e.getPlayer(), 2);
             return;
         }
 
@@ -33,7 +33,7 @@ public class SignEditListener implements Listener {
         ItemStack priceItemAndQuantity = LineChecker.parseItemAndQuantityLine(lines[2], SB.itemQuantitySeparator);
 
         if (priceItemAndQuantity == null) {
-            SB.error(e, "Error on line 3");
+            Errors.showUserError(Errors.INVALID_LINE, e.getPlayer(), 3);
             return;
         }
 
@@ -41,7 +41,7 @@ public class SignEditListener implements Listener {
         if (!SB.isWallSign(e.getBlock().getType()) ||
                 !ContainerUtil.isBlockStateContainer(SB.getBehindBlock(e.getBlock()).getState())) {
 
-            SB.error(e, "Sign must be placed on a container");
+            Errors.showUserError(Errors.SIGN_NOT_ON_CONTAINER, e.getPlayer());
             return;
         }
 
