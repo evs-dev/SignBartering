@@ -11,8 +11,6 @@ import org.bukkit.block.Sign;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.SignChangeEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -24,26 +22,12 @@ public class SB {
     public static final String formattedItemQuantitySeparator = "x";
     public static final String itemQuantitySeparator = ":";
 
-    public static final String error_NoMoney = "You have insufficient funds";
-
     public static int tryParseInt(String string) {
         try {
             return Integer.parseInt(string);
         } catch (NumberFormatException e) {
             return -1;
         }
-    }
-
-    public static void error(Player player, String message) {
-        player.sendMessage(SB.messagePrefix + ChatColor.RED + message);
-    }
-
-    public static void error(SignChangeEvent e, String message) {
-        error(e.getPlayer(), message);
-    }
-
-    public static void error(PlayerInteractEvent e, String message) {
-        error(e.getPlayer(), message);
     }
 
     public static String cleanName(String name) {
@@ -98,6 +82,7 @@ public class SB {
         return block.getRelative(directional.getFacing());
     }
 
+    @Deprecated
     public static boolean playerIsSignOwner(Sign sign, Player player) {
         String signName = removeBracketsFromNameLine(sign.getLine(3));
         return signName.equals(player.getDisplayName());
@@ -107,6 +92,7 @@ public class SB {
         return ChatColor.stripColor(line.replace("(", "").replace(")", ""));
     }
 
+    @Deprecated
     public static Player getSignOwner(String ownerLine) {
         String ownerName = SB.removeBracketsFromNameLine(ownerLine);
         return Bukkit.getPlayer(ownerName);
