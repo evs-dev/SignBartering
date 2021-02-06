@@ -10,9 +10,9 @@ public class BarteringSign {
     public BarteringSign(Sign sign) throws BarteringSignCreationException {
         if (!LineChecker.perfectFirstLine(sign.getLine(0))) throw new BarteringSignCreationException();
         //this.sign = sign; Might be used later
-        sellingItemStack = LineChecker.parseItemAndQuantityLine(sign.getLine(1), SBUtil.formattedItemQuantitySeparator);
+        sellingItemStack = LineChecker.parseItemAndQuantityLine(sign.getLine(1), Main.formattedItemQuantitySeparator);
         if (sellingItemStack == null) throw new BarteringSignCreationException(Errors.INVALID_SELLING_SIGN);
-        priceItemStack = LineChecker.parseItemAndQuantityLine(sign.getLine(2), SBUtil.formattedItemQuantitySeparator);
+        priceItemStack = LineChecker.parseItemAndQuantityLine(sign.getLine(2), Main.formattedItemQuantitySeparator);
         if (priceItemStack == null) throw new BarteringSignCreationException(Errors.INVALID_SELLING_SIGN);
         this.signOwner = getOwnerFromLine(sign.getLine(3));
         if (signOwner == null) throw new BarteringSignCreationException(Errors.INVALID_SELLING_SIGN);

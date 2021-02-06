@@ -17,11 +17,6 @@ import net.md_5.bungee.api.ChatColor;
 
 public class SBUtil {
 
-    public static final String requiredFirstLine = "[SELLING]";
-    public static final String alternativeRequiredFirstLine = "[SELL]";
-    public static final String formattedItemQuantitySeparator = "x";
-    public static final String itemQuantitySeparator = ":";
-
     private final static List<Material> wallSignMaterials = Arrays.asList(
         Material.ACACIA_WALL_SIGN,
         Material.BIRCH_WALL_SIGN,

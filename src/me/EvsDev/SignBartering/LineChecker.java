@@ -21,14 +21,17 @@ public class LineChecker {
     }
 
     public static boolean perfectFirstLine(String line) {
-        return (line != null) && (ChatColor.stripColor(line).equals(SBUtil.requiredFirstLine));
+        return (line != null) && (ChatColor.stripColor(line).equals(LineChecker.requiredFirstLine));
     }
 
     public static boolean sufficientFirstLine(String line) {
         line = ChatColor.stripColor(line);
         return (line != null)
-            && (line.equalsIgnoreCase((SBUtil.requiredFirstLine))
-                    || line.equalsIgnoreCase((SBUtil.alternativeRequiredFirstLine))
+            && (line.equalsIgnoreCase((LineChecker.requiredFirstLine))
+                    || line.equalsIgnoreCase((LineChecker.alternativeRequiredFirstLine))
                 );
     }
+
+    public static final String requiredFirstLine = "[SELLING]";
+    public static final String alternativeRequiredFirstLine = "[SELL]";
 }

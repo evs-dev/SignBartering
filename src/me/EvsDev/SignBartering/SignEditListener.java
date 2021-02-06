@@ -27,10 +27,10 @@ public class SignEditListener implements Listener {
             return;
         }
 
-        final ItemStack sellingItemStack = LineChecker.parseItemAndQuantityLine(e.getLine(1), SBUtil.itemQuantitySeparator);
+        final ItemStack sellingItemStack = LineChecker.parseItemAndQuantityLine(e.getLine(1), Main.itemQuantitySeparator);
         if (!validateItemStack(sellingItemStack, player, 2)) return;
 
-        final ItemStack priceItemStack = LineChecker.parseItemAndQuantityLine(e.getLine(2), SBUtil.itemQuantitySeparator);
+        final ItemStack priceItemStack = LineChecker.parseItemAndQuantityLine(e.getLine(2), Main.itemQuantitySeparator);
         if (!validateItemStack(priceItemStack, player, 3)) return;
 
         // Parse the (valid!) player's formatting into readable + InteractListener-parseable text
@@ -61,7 +61,7 @@ public class SignEditListener implements Listener {
     }
 
     private String formatFirstLine() {
-        return ChatColor.GOLD + SBUtil.requiredFirstLine;
+        return ChatColor.GOLD + LineChecker.requiredFirstLine;
     }
 
     private String formatLastLine(Player player) {
@@ -71,7 +71,7 @@ public class SignEditListener implements Listener {
     private String formatItemStackLine(ItemStack itemStack) {
         return ChatColor.WHITE
             + SBUtil.cleanName(itemStack.getType().toString())
-            + SBUtil.formattedItemQuantitySeparator
+            + Main.formattedItemQuantitySeparator
             + Integer.toString(itemStack.getAmount());
     }
 
