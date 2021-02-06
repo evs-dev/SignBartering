@@ -1,5 +1,8 @@
 package me.EvsDev.SignBartering;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.annotation.Nullable;
 
 import org.bukkit.Location;
@@ -71,12 +74,15 @@ public class InteractListener implements Listener {
         }
 
         // This has to happen to enable items' NBTs to be transferred
-        final ItemStack purchase = findPurchaseInContainer(containerInv, sellingItemStack);
+        final List<ItemStack> purchase = findPurchaseInContainer(containerInv, sellingItemStack);
 
         buyerInv.removeItem(payment);      // Take payment
         containerInv.addItem(payment);     // Store payment in container
-        containerInv.removeItem(purchase); // Take purchase from container
-        buyerInv.addItem(purchase);        // Give purchase to player
+
+        for (ItemStack itemStack : purchase) {
+            containerInv.removeItem(itemStack); // Take purchase from container
+            buyerInv.addItem(itemStack);        // Give purchase to player
+        }
 
         buyer.sendMessage(Main.MESSAGE_PREFIX + "Item(s) received");
 
@@ -143,18 +149,22 @@ public class InteractListener implements Listener {
         Errors.showUserError(Errors.OUT_OF_STOCK, buyer, appendix);
     }
 
-    private ItemStack findPurchaseInContainer(Inventory inventory, ItemStack selling) {
-        ItemStack purchase = null;
+    private List<ItemStack> findPurchaseInContainer(Inventory inventory, ItemStack selling) {
+        List<ItemStack> purchase = new ArrayList<>();
         for (ItemStack itemStack : inventory.getStorageContents()) {
             if (itemStack == null) continue;
             if (itemStack.getType() == selling.getType()) {
-                // Guarantees the NBT (of the first item)
-                purchase = new ItemStack(itemStack);
-                // Corrects the amount to the full amount
-                // because we know the container is stocked
-                // Issue: doesn't work for e.g. enchanted_book:2
-                purchase.setAmount(selling.getAmount());
-                break;
+                int currentTotalNumberOfPurchasedItems = 0;
+                for (ItemStack purchased : purchase) {
+                    currentTotalNumberOfPurchasedItems += purchased.getAmount();
+                }
+                if (currentTotalNumberOfPurchasedItems < selling.getAmount()) {
+                    ItemStack toAdd = new ItemStack(itemStack);
+                    toAdd.setAmount(Math.min(selling.getAmount() - currentTotalNumberOfPurchasedItems, itemStack.getAmount()));
+                    purchase.add(toAdd);
+                } else {
+                    break;
+                }
             }
         }
         return purchase;
