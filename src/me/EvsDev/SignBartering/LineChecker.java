@@ -23,4 +23,12 @@ public class LineChecker {
     public static boolean perfectFirstLine(String line) {
         return (line != null) && (ChatColor.stripColor(line).equals(SBUtil.requiredFirstLine));
     }
+
+    public static boolean sufficientFirstLine(String line) {
+        line = ChatColor.stripColor(line);
+        return (line != null)
+            && (line.equalsIgnoreCase((SBUtil.requiredFirstLine))
+                    || line.equalsIgnoreCase((SBUtil.alternativeRequiredFirstLine))
+                );
+    }
 }

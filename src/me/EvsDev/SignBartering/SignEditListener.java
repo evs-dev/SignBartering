@@ -44,8 +44,7 @@ public class SignEditListener implements Listener {
     }
 
     private boolean validateFirstLine(String line) {
-        return line == null
-            || !(line.equalsIgnoreCase(SBUtil.requiredFirstLine) && line.equalsIgnoreCase(SBUtil.alternativeRequiredFirstLine));
+        return LineChecker.sufficientFirstLine(line);
     }
 
     private boolean validateItemStack(ItemStack itemStack, Player signMaker, int line) {
