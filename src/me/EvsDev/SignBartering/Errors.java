@@ -38,7 +38,7 @@ public enum Errors {
     }
 
     private static void showUserError(String message, Player player) {
-        player.sendMessage(SB.messagePrefix + ChatColor.RED + message);
+        player.sendMessage(Main.MESSAGE_PREFIX + ChatColor.RED + message);
     }
 
 }

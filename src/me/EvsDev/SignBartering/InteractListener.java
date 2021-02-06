@@ -132,7 +132,7 @@ public class InteractListener implements Listener {
         containerInv.removeItem(purchase); // Take purchase from container
         playerInv.addItem(purchase);       // Give purchase to player
 
-        e.getPlayer().sendMessage(SB.messagePrefix + "Item(s) received");
+        e.getPlayer().sendMessage(Main.MESSAGE_PREFIX + "Item(s) received");
 
         Player owner = barteringSign.getSignOwner();
         if (owner == null) return;
@@ -145,7 +145,7 @@ public class InteractListener implements Listener {
             Integer.toString(payment.getAmount())
         );
 
-        owner.sendMessage(SB.messagePrefix + buyAlert);
+        owner.sendMessage(Main.MESSAGE_PREFIX + buyAlert);
     }
 
 }

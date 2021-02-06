@@ -73,10 +73,10 @@ public class SignEditListener implements Listener {
         // Send confirmation messages
         Player player = e.getPlayer();
         player.sendMessage(
-                SB.messagePrefix + ChatColor.GREEN + "Shop setup successfully!"
+                Main.MESSAGE_PREFIX + ChatColor.GREEN + "Shop setup successfully!"
                 );
         player.sendMessage(
-                SB.messagePrefix + "Make sure there is enough room in your chest for payment."
+                Main.MESSAGE_PREFIX + "Make sure there is enough room in your chest for payment."
                 );
         Location playerLocation = player.getLocation();
         String command;

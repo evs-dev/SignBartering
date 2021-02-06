@@ -13,7 +13,6 @@ import net.md_5.bungee.api.ChatColor;
 
 public class SB {
 
-    public static final String messagePrefix = ChatColor.GOLD + "[SignBartering] " + ChatColor.RESET;
     public static final String requiredFirstLine = "[SELLING]";
     public static final String alternativeRequiredFirstLine = "[SELL]";
     public static final String formattedItemQuantitySeparator = "x";
