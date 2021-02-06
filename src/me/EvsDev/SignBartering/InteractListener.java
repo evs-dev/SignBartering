@@ -25,7 +25,7 @@ public class InteractListener implements Listener {
 
         Block block = e.getClickedBlock();
 
-        if (ContainerUtil.isBlockStateContainer(block.getState())) {
+        if (SB.isBlockStateContainer(block.getState())) {
             onContainerInteractedWith(e);
         } else if (SB.isWallSign(block.getType())) {
             onSignInteractedWith(e);
@@ -33,7 +33,7 @@ public class InteractListener implements Listener {
     }
 
     private void onContainerInteractedWith(PlayerInteractEvent e) {
-        Block signBlock = ContainerUtil.findSurroundingSellingSignBlock(e.getClickedBlock());
+        Block signBlock = SB.findSurroundingSellingSignBlock(e.getClickedBlock());
 
         if (signBlock == null) return;
 

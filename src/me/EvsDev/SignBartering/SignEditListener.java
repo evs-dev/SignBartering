@@ -39,7 +39,7 @@ public class SignEditListener implements Listener {
 
         // Is it on a container?
         if (!SB.isWallSign(e.getBlock().getType()) ||
-                !ContainerUtil.isBlockStateContainer(SB.getBehindBlock(e.getBlock()).getState())) {
+                !SB.isBlockStateContainer(SB.getBehindBlock(e.getBlock()).getState())) {
 
             Errors.showUserError(Errors.SIGN_NOT_ON_CONTAINER, e.getPlayer());
             return;
