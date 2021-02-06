@@ -1,5 +1,7 @@
 package me.EvsDev.SignBartering;
 
+import javax.annotation.Nullable;
+
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -46,103 +48,127 @@ public class InteractListener implements Listener {
     }
 
     private void onSignInteractedWith(PlayerInteractEvent e) {
-        Block block = e.getClickedBlock();
-        Sign sign = (Sign) block.getState();
+        final Block block = e.getClickedBlock();
+        final Sign sign = (Sign) block.getState();
+        final Player buyer = e.getPlayer();
+        final BarteringSign barteringSign = createBarteringSign(sign, buyer);
+        if (barteringSign == null) return;
+        final ItemStack sellingItemStack = barteringSign.getSellingItemStack();
+        // Can assume that the behind block is a container because of SignEditListener validation
+        final Inventory containerInv = ((InventoryHolder)SBUtil.getBehindBlock(block).getState()).getInventory();
 
-        // Is [Selling] sign?
+        if (!inventoryIsStocked(containerInv, sellingItemStack)) {
+            showOutOfStockError(barteringSign, block, sellingItemStack, buyer);
+            return;
+        }
+
+        final PlayerInventory buyerInv = buyer.getInventory();
+        final ItemStack payment = barteringSign.getPriceItemStack();
+
+        if (!inventoryIsStocked(buyerInv, payment)) {
+            Errors.showUserError(Errors.INSUFFICIENT_FUNDS, buyer);
+            return;
+        }
+
+        // This has to happen to enable items' NBTs to be transferred
+        final ItemStack purchase = findPurchaseInContainer(containerInv, sellingItemStack);
+
+        buyerInv.removeItem(payment);      // Take payment
+        containerInv.addItem(payment);     // Store payment in container
+        containerInv.removeItem(purchase); // Take purchase from container
+        buyerInv.addItem(purchase);        // Give purchase to player
+
+        buyer.sendMessage(Main.MESSAGE_PREFIX + "Item(s) received");
+
+        final Player owner = barteringSign.getSignOwner();
+        if (owner == null) return;
+        sendBuyAlertToSeller(buyer, owner, sellingItemStack, payment);
+    }
+
+    @Nullable
+    private BarteringSign createBarteringSign(Sign sign, Player player) {
         BarteringSign barteringSign;
         try {
             barteringSign = new BarteringSign(sign);
         } catch (BarteringSignCreationException error) {
-            Errors.showUserError(error.getError(), e.getPlayer());
-            return;
+            Errors.showUserError(error.getError(), player);
+            return null;
         }
+        return barteringSign;
+    }
 
-        String[] lines = sign.getLines();
-
-        Inventory containerInv = ((InventoryHolder)SBUtil.getBehindBlock(block).getState()).getInventory();
-        ItemStack sellingItemStack = barteringSign.getSellingItemStack();
-
-        // Does the container behind this sign have enough to give?
+    private boolean inventoryIsStocked(Inventory inventory, ItemStack selling) {
         boolean isStocked = false;
         int foundAmount = 0;
-        for (ItemStack itemStack : containerInv.getStorageContents()) {
+        for (ItemStack itemStack : inventory.getStorageContents()) {
             if (itemStack == null) continue;
-            if (itemStack.getType() != sellingItemStack.getType()) {
+            if (itemStack.getType() != selling.getType()) {
                 isStocked = false;
-            } else if (itemStack.getAmount() >= sellingItemStack.getAmount()) {
+            } else if (itemStack.getAmount() >= selling.getAmount()) {
                 isStocked = true;
                 break;
             } else {
                 foundAmount += itemStack.getAmount();
-                if (foundAmount >= sellingItemStack.getAmount()) {
+                if (foundAmount >= selling.getAmount()) {
                     isStocked = true;
                     break;
                 }
             }
         }
+        return isStocked;
+    }
 
-        if (!isStocked) {
-            String appendix = "The shop owner " + lines[3] + ChatColor.RED;
-            Player owner = barteringSign.getSignOwner();
+    private void showOutOfStockError(BarteringSign sign, Block signBlock, ItemStack selling, Player buyer) {
+        final Player owner = sign.getSignOwner();
+        String appendix = ChatColor.translateAlternateColorCodes('&', "The shop owner &7(")
+            + owner.getName()
+            + ")"
+            + ChatColor.RED;
 
-            if (owner != null) {
-                Location blockLocation = block.getLocation();
-                Errors.showUserError(Errors.OWNERS_SHOP_OUT_OF_STOCK, owner,
-                    e.getPlayer().getDisplayName(),
-                    SBUtil.cleanName(sellingItemStack.getType().toString()),
-                    Integer.toString(sellingItemStack.getAmount()),
-                    blockLocation.getBlockX(),
-                    blockLocation.getBlockY(),
-                    blockLocation.getBlockZ()
-                );
-                appendix += " has been notified";
-            } else {
-                appendix += " could not be notified as they are offline";
-            }
-
-            Errors.showUserError(Errors.OUT_OF_STOCK, e.getPlayer(), appendix);
-            return;
+        if (owner != null && owner.isOnline()) {
+            final Location blockLocation = signBlock.getLocation();
+            Errors.showUserError(Errors.OWNERS_SHOP_OUT_OF_STOCK, owner,
+                buyer.getDisplayName(),
+                SBUtil.cleanName(selling.getType().toString()),
+                Integer.toString(selling.getAmount()),
+                blockLocation.getBlockX(),
+                blockLocation.getBlockY(),
+                blockLocation.getBlockZ()
+            );
+            appendix += " has been notified";
+        } else {
+            appendix += " could not be notified as they are offline";
         }
 
-        PlayerInventory playerInv = e.getPlayer().getInventory();
-        ItemStack payment = barteringSign.getPriceItemStack();
+        Errors.showUserError(Errors.OUT_OF_STOCK, buyer, appendix);
+    }
 
-        if (!playerInv.containsAtLeast(payment, 1)) {
-            Errors.showUserError(Errors.INSUFFICIENT_FUNDS, e.getPlayer());
-            return;
-        }
-
-        // Find purchase in container
+    private ItemStack findPurchaseInContainer(Inventory inventory, ItemStack selling) {
         ItemStack purchase = null;
-        for (ItemStack itemStack : containerInv.getStorageContents()) {
+        for (ItemStack itemStack : inventory.getStorageContents()) {
             if (itemStack == null) continue;
-            if (itemStack.getType() == sellingItemStack.getType()) {
+            if (itemStack.getType() == selling.getType()) {
+                // Guarantees the NBT (of the first item)
                 purchase = new ItemStack(itemStack);
-                purchase.setAmount(sellingItemStack.getAmount());
+                // Corrects the amount to the full amount
+                // because we know the container is stocked
+                // Issue: doesn't work for e.g. enchanted_book:2
+                purchase.setAmount(selling.getAmount());
                 break;
             }
         }
+        return purchase;
+    }
 
-        playerInv.removeItem(payment);     // Take payment
-        containerInv.addItem(payment);     // Store payment in container
-        containerInv.removeItem(purchase); // Take purchase from container
-        playerInv.addItem(purchase);       // Give purchase to player
-
-        e.getPlayer().sendMessage(Main.MESSAGE_PREFIX + "Item(s) received");
-
-        Player owner = barteringSign.getSignOwner();
-        if (owner == null) return;
-
+    private void sendBuyAlertToSeller(Player buyer, Player seller, ItemStack selling, ItemStack payment) {
         String buyAlert = String.format("%s bought [%s]x%s for [%s]x%s from your shop!",
-            e.getPlayer().getDisplayName(),
-            SBUtil.cleanName(sellingItemStack.getType().toString()),
-            Integer.toString(sellingItemStack.getAmount()),
+            buyer.getDisplayName(),
+            SBUtil.cleanName(selling.getType().toString()),
+            Integer.toString(selling.getAmount()),
             SBUtil.cleanName(payment.getType().toString()),
             Integer.toString(payment.getAmount())
         );
-
-        owner.sendMessage(Main.MESSAGE_PREFIX + buyAlert);
+        seller.sendMessage(Main.MESSAGE_PREFIX + buyAlert);
     }
 
 }
