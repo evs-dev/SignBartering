@@ -9,7 +9,7 @@ public enum Errors {
     NONE(""),
     INSUFFICIENT_FUNDS("You have insufficient funds"),
     INVALID_LINE("Error on line %s"),
-    INVALID_SELLING_SIGN("Something is wrong with this SignBartering shop"),
+    INVALID_SELLING_SIGN("Something is wrong with this shop"),
     OUT_OF_STOCK("The shop is not currently stocked. %s"),
     OWNERS_SHOP_OUT_OF_STOCK("%s tried to purchase [%s]x%s from your shop at X: %s Y: %s Z: %s but it is out of stock"),
     NOT_THE_OWNER("You cannot open this container as you are not the owner of this shop"),
