@@ -39,8 +39,13 @@ public class BarteringSign {
         return signOwner;
     }
 
-    public boolean playerIsSignOwner(Player player) {
-        String signName = SB.removeBracketsFromNameLine(signOwner.getDisplayName());
+    public static boolean playerIsSignOwner(Player player, Sign sign) {
+        String signName = SB.removeBracketsFromNameLine(sign.getLine(3));
+        return signName.equals(player.getDisplayName());
+    }
+
+    public static boolean playerIsSignOwner(Player player, BarteringSign sign) {
+        String signName = sign.getSignOwner().getDisplayName();
         return signName.equals(player.getDisplayName());
     }
 

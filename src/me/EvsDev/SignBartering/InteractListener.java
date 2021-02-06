@@ -37,7 +37,7 @@ public class InteractListener implements Listener {
 
         if (signBlock == null) return;
 
-        if (!SB.playerIsSignOwner((Sign) signBlock.getState(), e.getPlayer())) {
+        if (!BarteringSign.playerIsSignOwner(e.getPlayer(), (Sign) signBlock.getState())) {
             Errors.showUserError(Errors.NOT_THE_OWNER, e.getPlayer());
             e.setCancelled(true);
         }

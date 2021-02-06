@@ -6,10 +6,8 @@ import java.util.List;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.Sign;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
-import org.bukkit.entity.Player;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -79,12 +77,6 @@ public class SB {
         BlockData data = block.getBlockData();
         Directional directional = (Directional)data;
         return block.getRelative(directional.getFacing());
-    }
-
-    @Deprecated
-    public static boolean playerIsSignOwner(Sign sign, Player player) {
-        String signName = removeBracketsFromNameLine(sign.getLine(3));
-        return signName.equals(player.getDisplayName());
     }
 
     public static String removeBracketsFromNameLine(String line) {
