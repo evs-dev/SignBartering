@@ -11,12 +11,12 @@ A Minecraft plugin for simple, player-made sign shops.
 
 ![Step 2](https://media.discordapp.net/attachments/736921748653473852/736924140279431188/2020-07-26_13.27.29-l.png)
 
-### Step 3 - Type as follows (the formatting is extremely important; notice the colons):
+### Step 3 - Type as follows (the formatting is extremely important; notice the asterisks *):
 
-**Line 1:** `[sell]`  
-**Line 2:** `what you are selling:how much of the item you are selling per purchase`  
-**Line 3:** `what the price item is:how much of the item`  
-**Line 4:** `leave blank (the plugin will fill in your name automatically)`
+**Line 1:** `[sell]` / `[free]` / `[isell] (op only)`  
+**Line 2:** `what you are selling*how much of the item you are selling per purchase`  
+**Line 3:** `what the payment item is*how much of the item`  
+**Line 4:** `leave blank (the plugin will fill in your name automatically) - if using [isell], you can put a custom message here`
 
 ![Step 3](https://cdn.discordapp.com/attachments/736921748653473852/736924605322625074/2020-07-26_13.27.54-l.png)
 
