@@ -13,7 +13,8 @@ public enum Errors {
     OUT_OF_STOCK("The shop is not currently stocked. %s"),
     OWNERS_SHOP_OUT_OF_STOCK("%s tried to purchase [%s]x%s from your shop at X: %s Y: %s Z: %s but it is out of stock"),
     NOT_THE_OWNER("You cannot open this container as you are not the owner of this shop"),
-    SIGN_NOT_ON_CONTAINER("Sign must be placed on a container")
+    SIGN_NOT_ON_CONTAINER("Sign must be placed on a container"),
+    NO_PERMISSION("You do not have permission to make this type of shop")
     ;
 
     private Errors(String errorMessage) {
