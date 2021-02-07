@@ -12,6 +12,7 @@ import org.bukkit.block.Sign;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
 
 import net.md_5.bungee.api.ChatColor;
 
@@ -75,6 +76,13 @@ public final class SBUtil {
             }
         }
         return null;
+    }
+
+    public static String formatItemStackLine(ItemStack itemStack) {
+        return ChatColor.WHITE
+            + SBUtil.cleanName(itemStack.getType().toString())
+            + Main.FORMATTED_ITEM_QUANTITY_SEPARATOR
+            + Integer.toString(itemStack.getAmount());
     }
 
 }
