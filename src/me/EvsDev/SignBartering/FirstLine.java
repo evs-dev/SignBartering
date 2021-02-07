@@ -1,8 +1,11 @@
 package me.EvsDev.SignBartering;
 
+import me.EvsDev.SignBartering.LineFormatters.AllowEmptyNameLineFormatter;
 import me.EvsDev.SignBartering.LineFormatters.BasicNameLineFormatter;
 import me.EvsDev.SignBartering.LineFormatters.BasicSellingLineFormatter;
+import me.EvsDev.SignBartering.LineFormatters.FreePriceLineFormatter;
 import me.EvsDev.SignBartering.LineFormatters.HasCostPriceLineFormatter;
+import me.EvsDev.SignBartering.LineFormatters.InfiniteSellingLineFormatter;
 import me.EvsDev.SignBartering.LineFormatters.NameLineFormatter;
 import me.EvsDev.SignBartering.LineFormatters.PriceLineFormatter;
 import me.EvsDev.SignBartering.LineFormatters.SellingLineFormatter;
@@ -10,14 +13,17 @@ import net.md_5.bungee.api.ChatColor;
 
 public enum FirstLine {
 
-    SELL("sell", "SELLING", new BasicSellingLineFormatter(), new HasCostPriceLineFormatter(), new BasicNameLineFormatter(), "selling")
+    SELL("sell", "SELLING", new BasicSellingLineFormatter(), new HasCostPriceLineFormatter(), new BasicNameLineFormatter(), false, "selling", "barter"),
+    FREE("free", "FREE", new BasicSellingLineFormatter(), new FreePriceLineFormatter(), new BasicNameLineFormatter(), false, "give"),
+    ISELL("isell", "INFINITE", new InfiniteSellingLineFormatter(), new HasCostPriceLineFormatter(), new AllowEmptyNameLineFormatter(), true, "infinite", "inf")
     ;
 
     FirstLine(String name, String perfectName,
             SellingLineFormatter sellingLineFormatter, PriceLineFormatter priceLineFormatter, NameLineFormatter nameLineFormatter,
-            String... aliases
+            boolean onlyOp, String... aliases
             ) {
         this.perfectName = perfectName;
+        this.onlyOp = onlyOp;
         this.names = new String[1 + aliases.length];
         this.names[0] = name;
         for (int i = 0; i < aliases.length; i++) {
@@ -30,9 +36,14 @@ public enum FirstLine {
 
     private final String[] names;
     private final String perfectName;
+    private final boolean onlyOp;
     private final SellingLineFormatter sellingLineFormatter;
     private final PriceLineFormatter priceLineFormatter;
     private final NameLineFormatter nameLineFormatter;
+
+    public String getPerfectName() {
+        return perfectName;
+    }
 
     public SellingLineFormatter getSellingLineFormatter() {
         return sellingLineFormatter;
@@ -44,6 +55,10 @@ public enum FirstLine {
 
     public NameLineFormatter getNameLineFormatter() {
         return nameLineFormatter;
+    }
+
+    public boolean onlyOp() {
+        return onlyOp;
     }
 
     public static FirstLine interpretFirstLine(String line, boolean perfect) {

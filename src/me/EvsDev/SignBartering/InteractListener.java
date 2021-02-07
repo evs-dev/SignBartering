@@ -1,6 +1,7 @@
 package me.EvsDev.SignBartering;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -26,7 +27,7 @@ public class InteractListener implements Listener {
 
     @EventHandler
     public void onSignOrContainerInteractedWith(PlayerInteractEvent e) {
-        if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getHand() != EquipmentSlot.HAND || e.getPlayer().isSneaking()) return;
+        if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getHand() != EquipmentSlot.HAND) return;
 
         Block block = e.getClickedBlock();
 
@@ -42,7 +43,10 @@ public class InteractListener implements Listener {
 
         if (surroundingSign == null) return;
 
-        if (!BarteringSign.playerIsSignOwner(e.getPlayer(), surroundingSign)) {
+        final FirstLine firstLine = FirstLine.interpretFirstLine(surroundingSign.getLine(0), true);
+        final boolean isOpOnly = firstLine != null && firstLine.onlyOp();
+
+        if (!(isOpOnly ? e.getPlayer().isOp() : true) && !BarteringSign.playerIsSignOwner(e.getPlayer(), surroundingSign)) {
             Errors.showUserError(Errors.NOT_THE_OWNER, e.getPlayer());
             e.setCancelled(true);
         }
@@ -51,16 +55,28 @@ public class InteractListener implements Listener {
     }
 
     private void onSignInteractedWith(PlayerInteractEvent e) {
+        if (e.getPlayer().isSneaking()) return;
         final Block block = e.getClickedBlock();
         final Sign sign = (Sign) block.getState();
         final Player buyer = e.getPlayer();
-        final BarteringSign barteringSign = createBarteringSign(sign, buyer);
+        final FirstLine firstLine = FirstLine.interpretFirstLine(sign.getLine(0), true);
+        if (firstLine == null) {
+            //Errors.showUserError(Errors.INVALID_LINE, buyer, "oh no");
+            return;
+        }
+        final BarteringSign barteringSign = createBarteringSign(sign, buyer, firstLine);
         if (barteringSign == null) return;
         final ItemStack sellingItemStack = barteringSign.getSellingItemStack();
         // Can assume that the behind block is a container because of SignEditListener validation
-        final Inventory containerInv = ((InventoryHolder)SBUtil.getBehindBlock(block).getState()).getInventory();
+        Inventory containerInv;
+        try {
+            containerInv = ((InventoryHolder)SBUtil.getBehindBlock(block).getState()).getInventory();
+        } catch (ClassCastException exception) {
+            Errors.showUserError(Errors.SIGN_NOT_ON_CONTAINER, buyer);
+            return;
+        }
 
-        if (!inventoryIsStocked(containerInv, sellingItemStack)) {
+        if (firstLine.getSellingLineFormatter().shouldCheckIfContainerInStock() && !inventoryIsStocked(containerInv, sellingItemStack)) {
             showOutOfStockError(barteringSign, block, sellingItemStack, buyer);
             return;
         }
@@ -74,7 +90,12 @@ public class InteractListener implements Listener {
         }
 
         // This has to happen to enable items' NBTs to be transferred
-        final List<ItemStack> purchase = findPurchaseInContainer(containerInv, sellingItemStack);
+        List<ItemStack> purchase;
+        if (firstLine.getSellingLineFormatter().shouldCheckIfContainerInStock()) {
+            purchase = findPurchaseInContainer(containerInv, sellingItemStack);
+        } else {
+            purchase = Arrays.asList(sellingItemStack.clone());
+        }
 
         buyerInv.removeItem(payment);           // Take payment
         containerInv.addItem(payment);          // Store payment in container
@@ -92,12 +113,7 @@ public class InteractListener implements Listener {
     }
 
     @Nullable
-    private BarteringSign createBarteringSign(Sign sign, Player player) {
-        FirstLine firstLine = FirstLine.interpretFirstLine(sign.getLine(0), true);
-        if (firstLine == null) {
-            Errors.showUserError(Errors.INVALID_LINE, player, "oh no");
-            return null;
-        }
+    private BarteringSign createBarteringSign(Sign sign, Player player, FirstLine firstLine) {
         BarteringSign barteringSign;
         try {
             barteringSign = new BarteringSign(sign, firstLine);
@@ -111,6 +127,7 @@ public class InteractListener implements Listener {
     private boolean inventoryIsStocked(Inventory inventory, ItemStack selling) {
         boolean isStocked = false;
         int foundAmount = 0;
+        if (selling.getAmount() <= 0) return true;
         for (ItemStack itemStack : inventory.getStorageContents()) {
             if (itemStack == null) continue;
             if (itemStack.getType() != selling.getType()) {
@@ -157,6 +174,7 @@ public class InteractListener implements Listener {
     private List<ItemStack> findPurchaseInContainer(Inventory inventory, ItemStack selling) {
         final List<ItemStack> purchase = new ArrayList<>();
         int currentTotalNumberOfPurchasedItems = 0;
+        if (selling.getAmount() <= 0) return purchase;
         for (ItemStack itemStack : inventory.getStorageContents()) {
             if (itemStack == null) continue;
             if (itemStack.getType() == selling.getType()) {

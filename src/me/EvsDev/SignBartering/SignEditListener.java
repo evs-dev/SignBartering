@@ -21,7 +21,7 @@ public class SignEditListener implements Listener {
 
     @EventHandler
     public void onSignChange(SignChangeEvent e) {
-        final FirstLine firstLine = FirstLine.interpretFirstLine(e.getLine(0), false);
+        FirstLine firstLine = FirstLine.interpretFirstLine(e.getLine(0), false);
         if (firstLine == null) return;
 
         final Player player = e.getPlayer();
@@ -31,19 +31,26 @@ public class SignEditListener implements Listener {
             return;
         }
 
+        if (firstLine.onlyOp() && !player.isOp()) {
+            Errors.showUserError(Errors.NO_PERMISSION, player);
+            return;
+        }
+
         final SellingLineFormatter sellingLineFormatter = firstLine.getSellingLineFormatter();
         final Object sellingLineResult = sellingLineFormatter.interpretPlayerFormattedLine(e.getLine(1));
         if (!validateItemStackLineResult(sellingLineResult, sellingLineFormatter, player, 2)) return;
 
+        // Special case - if they have set price to free, make it a FirstLine.FREE sign
+        if (firstLine == FirstLine.SELL && e.getLine(2).endsWith(Main.ITEM_QUANTITY_SEPARATOR + "0")) firstLine = FirstLine.FREE;
         final PriceLineFormatter priceLineFormatter = firstLine.getPriceLineFormatter();
         final Object priceLineResult = priceLineFormatter.interpretPlayerFormattedLine(e.getLine(2));
         if (!validateItemStackLineResult(priceLineResult, priceLineFormatter, player, 3)) return;
 
         // Parse the (valid!) player's formatting into readable + InteractListener-parseable text
-        e.setLine(0, formatFirstLine());
+        e.setLine(0, formatFirstLine(firstLine));
         e.setLine(1, sellingLineFormatter.formatSelfInterpretedLine(sellingLineResult));
         e.setLine(2, priceLineFormatter.formatSelfInterpretedLine(priceLineResult));
-        e.setLine(3, firstLine.getNameLineFormatter().formatPlayerFormattedLine(player));
+        e.setLine(3, firstLine.getNameLineFormatter().formatPlayerFormattedLine(e.getLine(3), player));
 
         sendSetUpConfirmation(player);
         //sendClickToAnnounceMessage(player, sellingItemStack, priceItemStack);
@@ -62,13 +69,13 @@ public class SignEditListener implements Listener {
             && SBUtil.isContainer(SBUtil.getBehindBlock(block).getState()));
     }
 
-    private String formatFirstLine() {
-        return ChatColor.GOLD + LineChecker.REQUIRED_FIRST_LINE;
+    private String formatFirstLine(FirstLine firstLine) {
+        return ChatColor.GOLD + "[" + firstLine.getPerfectName() + "]";
     }
 
     private void sendSetUpConfirmation(Player player) {
         player.sendMessage(Main.MESSAGE_PREFIX + ChatColor.GREEN + "Shop setup successfully!");
-        player.sendMessage(Main.MESSAGE_PREFIX + "Make sure there is enough room in your chest for payment.");
+        player.sendMessage(Main.MESSAGE_PREFIX + "Make sure there is enough room in your container for payment.");
     }
 
     private TextComponent createClickToAnnounceMessage(String command) {
