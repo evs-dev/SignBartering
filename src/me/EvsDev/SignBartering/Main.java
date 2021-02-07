@@ -9,7 +9,7 @@ public class Main extends JavaPlugin {
 
     public static final String MESSAGE_PREFIX = ChatColor.GOLD + "[SignBartering] " + ChatColor.RESET;
     public static final String ITEM_QUANTITY_SEPARATOR = ":";
-    public static final String FORMATTED_ITEM_QUANTITY_SEPARATOR = "x";
+    public static final String FORMATTED_ITEM_QUANTITY_SEPARATOR = "*";
 
     @Override
     public void onEnable() {

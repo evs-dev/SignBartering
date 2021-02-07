@@ -1,5 +1,7 @@
 package me.EvsDev.SignBartering;
 
+import java.util.regex.Pattern;
+
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -11,7 +13,7 @@ public class LineChecker {
     public static final String ALTERNATIVE_REQUIRED_FIRST_LINE = "[SELL]";
 
     public static ItemStack parseItemAndQuantityLine(String line, String separator) {
-        String[] split = ChatColor.stripColor(line).split(separator);
+        String[] split = ChatColor.stripColor(line).split(Pattern.quote(separator));
         if (split.length != 2) return null;
 
         Material item = Material.matchMaterial(ChatColor.stripColor(split[0]));
