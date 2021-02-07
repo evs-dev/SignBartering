@@ -72,7 +72,7 @@ public final class SBUtil {
 
             if (isWallSign(block.getType())) {
                 final Sign sign = (Sign) block.getState();
-                if (LineChecker.perfectFirstLine(sign.getLine(0))) return sign;
+                if (FirstLine.interpretFirstLine(sign.getLine(0), true) != null) return sign;
             }
         }
         return null;
