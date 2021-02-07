@@ -76,8 +76,8 @@ public class InteractListener implements Listener {
         // This has to happen to enable items' NBTs to be transferred
         final List<ItemStack> purchase = findPurchaseInContainer(containerInv, sellingItemStack);
 
-        buyerInv.removeItem(payment);      // Take payment
-        containerInv.addItem(payment);     // Store payment in container
+        buyerInv.removeItem(payment);           // Take payment
+        containerInv.addItem(payment);          // Store payment in container
 
         for (ItemStack itemStack : purchase) {
             containerInv.removeItem(itemStack); // Take purchase from container
@@ -93,9 +93,14 @@ public class InteractListener implements Listener {
 
     @Nullable
     private BarteringSign createBarteringSign(Sign sign, Player player) {
+        FirstLine firstLine = FirstLine.interpretFirstLine(sign.getLine(0), true);
+        if (firstLine == null) {
+            Errors.showUserError(Errors.INVALID_LINE, player, "oh no");
+            return null;
+        }
         BarteringSign barteringSign;
         try {
-            barteringSign = new BarteringSign(sign);
+            barteringSign = new BarteringSign(sign, firstLine);
         } catch (BarteringSignCreationException error) {
             Errors.showUserError(error.getError(), player);
             return null;
