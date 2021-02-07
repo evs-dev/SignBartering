@@ -33,11 +33,13 @@ public class BarteringSign {
     }
 
     public static boolean playerIsSignOwner(Player player, Sign sign) {
+        if (sign == null || player == null) return false;
         String signName = SBUtil.removeBracketsFromSignLine(sign.getLine(3));
         return signName.equals(player.getDisplayName());
     }
 
     public static boolean playerIsSignOwner(Player player, BarteringSign sign) {
+        if (sign.getSignOwner() == null || player == null) return false;
         String signName = sign.getSignOwner().getDisplayName();
         return signName.equals(player.getDisplayName());
     }
