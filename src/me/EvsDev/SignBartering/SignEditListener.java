@@ -57,7 +57,7 @@ public class SignEditListener implements Listener {
     }
 
     private boolean validateItemStackLineResult(Object result, IItemStackLineFormatter lineFormatter, Player signMaker, int line) {
-        if (!lineFormatter.isValid(result)) {
+        if (!lineFormatter.isValidSelfInterpretation(result)) {
             Errors.showUserError(Errors.INVALID_LINE, signMaker, line);
             return false;
         }

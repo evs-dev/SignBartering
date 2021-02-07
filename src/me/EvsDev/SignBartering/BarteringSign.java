@@ -7,13 +7,13 @@ import org.bukkit.inventory.ItemStack;
 public class BarteringSign {
 
     public BarteringSign(Sign sign, FirstLine firstLine) throws BarteringSignCreationException {
-        sellingItemStack = firstLine.getSellingLineFormatter().interpretPluginFormattedLine(sign.getLine(1));
+        sellingItemStack = firstLine.getSellingLineFormatter().interpretSelfFormattedLine(sign.getLine(1));
         if (sellingItemStack == null) throw new BarteringSignCreationException(Errors.INVALID_SELLING_SIGN);
 
-        priceItemStack = firstLine.getPriceLineFormatter().interpretPluginFormattedLine(sign.getLine(2));
+        priceItemStack = firstLine.getPriceLineFormatter().interpretSelfFormattedLine(sign.getLine(2));
         if (priceItemStack == null) throw new BarteringSignCreationException(Errors.INVALID_SELLING_SIGN);
 
-        this.signOwner = firstLine.getNameLineFormatter().interpretPluginFormattedLine(sign.getLine(3));
+        this.signOwner = firstLine.getNameLineFormatter().interpretSelfFormattedLine(sign.getLine(3));
     }
 
     private final ItemStack sellingItemStack;

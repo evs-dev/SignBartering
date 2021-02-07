@@ -14,7 +14,7 @@ public class BasicNameLineFormatter extends NameLineFormatter {
     }
 
     @Override
-    public Player interpretPluginFormattedLine(String line) {
+    public Player interpretSelfFormattedLine(String line) {
         String ownerName = SBUtil.removeBracketsFromSignLine(line);
         return Bukkit.getPlayer(ownerName);
     }

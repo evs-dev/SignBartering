@@ -14,7 +14,7 @@ public class BasicSellingLineFormatter extends SellingLineFormatter {
     }
 
     @Override
-    public boolean isValid(Object result) {
+    public boolean isValidSelfInterpretation(Object result) {
         return result != null;
     }
 
@@ -25,7 +25,7 @@ public class BasicSellingLineFormatter extends SellingLineFormatter {
     }
 
     @Override
-    public ItemStack interpretPluginFormattedLine(String line) {
+    public ItemStack interpretSelfFormattedLine(String line) {
         return LineChecker.parseItemAndQuantityLine(line, Main.FORMATTED_ITEM_QUANTITY_SEPARATOR);
     }
 

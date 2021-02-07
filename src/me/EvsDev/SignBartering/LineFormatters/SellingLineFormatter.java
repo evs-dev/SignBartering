@@ -7,11 +7,11 @@ public abstract class SellingLineFormatter implements IItemStackLineFormatter {
     @Override
     public abstract Object interpretPlayerFormattedLine(String line);
     @Override
-    public abstract boolean isValid(Object result);
+    public abstract boolean isValidSelfInterpretation(Object result);
     @Override
     public abstract String formatSelfInterpretedLine(Object result);
     @Override
-    public abstract ItemStack interpretPluginFormattedLine(String line);
+    public abstract ItemStack interpretSelfFormattedLine(String line);
     public abstract boolean shouldCheckIfContainerInStock();
 
 }

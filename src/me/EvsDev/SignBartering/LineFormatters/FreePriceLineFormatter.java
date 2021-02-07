@@ -11,7 +11,7 @@ public class FreePriceLineFormatter extends PriceLineFormatter {
     }
 
     @Override
-    public boolean isValid(Object result) {
+    public boolean isValidSelfInterpretation(Object result) {
         return true;
     }
 
@@ -21,7 +21,7 @@ public class FreePriceLineFormatter extends PriceLineFormatter {
     }
 
     @Override
-    public ItemStack interpretPluginFormattedLine(String line) {
+    public ItemStack interpretSelfFormattedLine(String line) {
         return new ItemStack(Material.AIR, 0);
     }
 

@@ -20,9 +20,9 @@ public class AllowEmptyNameLineFormatter extends BasicNameLineFormatter {
     }
 
     @Override
-    public Player interpretPluginFormattedLine(String line) {
+    public Player interpretSelfFormattedLine(String line) {
         if (line.isEmpty()) return null;
-        return super.interpretPluginFormattedLine(line);
+        return super.interpretSelfFormattedLine(line);
     }
 
 }

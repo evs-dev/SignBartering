@@ -10,10 +10,10 @@ public interface IItemStackLineFormatter {
     /** Used by {@link SignEditListener.onSignChange} */
     Object interpretPlayerFormattedLine(String line);
     /** Used by {@link SignEditListener.validateItemStackLineResult} */
-    boolean isValid(Object result);
+    boolean isValidSelfInterpretation(Object result);
     /** Used by {@link SignEditListener.onSignChange} */
     String formatSelfInterpretedLine(Object result);
-    /** Used by {@link BarteringSign} */
-    ItemStack interpretPluginFormattedLine(String line);
+    /** Used by {@link BarteringSign}*/
+    ItemStack interpretSelfFormattedLine(String line);
 
 }
