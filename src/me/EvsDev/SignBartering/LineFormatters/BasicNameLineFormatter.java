@@ -9,7 +9,7 @@ import net.md_5.bungee.api.ChatColor;
 public class BasicNameLineFormatter extends NameLineFormatter {
 
     @Override
-    public String formatPlayerFormattedLine(Player signMaker) {
+    public String formatPlayerFormattedLine(String line, Player signMaker) {
         return ChatColor.GRAY + "(" + signMaker.getDisplayName() + ")";
     }
 

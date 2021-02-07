@@ -29,4 +29,9 @@ public class BasicSellingLineFormatter extends SellingLineFormatter {
         return LineChecker.parseItemAndQuantityLine(line, Main.FORMATTED_ITEM_QUANTITY_SEPARATOR);
     }
 
+    @Override
+    public boolean shouldCheckIfContainerInStock() {
+        return true;
+    }
+
 }

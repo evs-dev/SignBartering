@@ -12,5 +12,6 @@ public abstract class SellingLineFormatter implements IItemStackLineFormatter {
     public abstract String formatSelfInterpretedLine(Object result);
     @Override
     public abstract ItemStack interpretPluginFormattedLine(String line);
+    public abstract boolean shouldCheckIfContainerInStock();
 
 }
