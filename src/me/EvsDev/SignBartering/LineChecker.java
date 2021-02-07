@@ -25,6 +25,7 @@ public class LineChecker {
         return new ItemStack(item, quantity);
     }
 
+    @Deprecated
     public static boolean perfectFirstLine(String line) {
         return (line != null) && (ChatColor.stripColor(line).equals(LineChecker.REQUIRED_FIRST_LINE));
     }
