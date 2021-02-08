@@ -13,10 +13,18 @@ A Minecraft plugin for simple, player-made sign shops.
 
 ### Step 3 - Type as follows (the formatting is extremely important; notice the asterisks *):
 
-**Line 1:** `[sell]` / `[free]` / `[isell] (op only)`  
+**Line 1:** `[command (see below)]`  
 **Line 2:** `what you are selling*how much of the item you are selling per purchase`  
 **Line 3:** `what the payment item is*how much of the item`  
 **Line 4:** `leave blank (the plugin will fill in your name automatically) - if using [isell], you can put a custom message here`
+
+#### Line 1 commands:
+
+[command] | Description | Anyone can use? | Aliases
+--- | --- | :---: | ---
+[sell] | Sell anything with a price | ✅ | [selling], [barter]
+[free] | Sell anything for free | ✅ | [give]
+[isell] | Sell anything with a price without stocking the container with it | ❌ (op only) | [infinite], [inf]
 
 ![Step 3](images/step3.png)
 
