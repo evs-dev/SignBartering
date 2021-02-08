@@ -8,6 +8,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.inventory.ItemStack;
 
+import me.EvsDev.SignBartering.LineFormatters.IItemStackLineFormatter;
+import me.EvsDev.SignBartering.LineFormatters.PriceLineFormatter;
+import me.EvsDev.SignBartering.LineFormatters.SellingLineFormatter;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -18,7 +21,8 @@ public class SignEditListener implements Listener {
 
     @EventHandler
     public void onSignChange(SignChangeEvent e) {
-        if (!validateFirstLine(e.getLine(0))) return;
+        FirstLine firstLine = FirstLine.interpretFirstLine(e.getLine(0), false);
+        if (firstLine == null) return;
 
         final Player player = e.getPlayer();
 
@@ -27,28 +31,33 @@ public class SignEditListener implements Listener {
             return;
         }
 
-        final ItemStack sellingItemStack = LineChecker.parseItemAndQuantityLine(e.getLine(1), Main.ITEM_QUANTITY_SEPARATOR);
-        if (!validateItemStack(sellingItemStack, player, 2)) return;
+        if (firstLine.onlyOp() && !player.isOp()) {
+            Errors.showUserError(Errors.NO_PERMISSION, player);
+            return;
+        }
 
-        final ItemStack priceItemStack = LineChecker.parseItemAndQuantityLine(e.getLine(2), Main.ITEM_QUANTITY_SEPARATOR);
-        if (!validateItemStack(priceItemStack, player, 3)) return;
+        final SellingLineFormatter sellingLineFormatter = firstLine.getSellingLineFormatter();
+        final Object sellingLineResult = sellingLineFormatter.interpretPlayerFormattedLine(e.getLine(1));
+        if (!validateItemStackLineResult(sellingLineResult, sellingLineFormatter, player, 2)) return;
+
+        // Special case - if they have set price to free, make it a FirstLine.FREE sign
+        if (firstLine == FirstLine.SELL && e.getLine(2).endsWith(Main.ITEM_QUANTITY_SEPARATOR + "0")) firstLine = FirstLine.FREE;
+        final PriceLineFormatter priceLineFormatter = firstLine.getPriceLineFormatter();
+        final Object priceLineResult = priceLineFormatter.interpretPlayerFormattedLine(e.getLine(2));
+        if (!validateItemStackLineResult(priceLineResult, priceLineFormatter, player, 3)) return;
 
         // Parse the (valid!) player's formatting into readable + InteractListener-parseable text
-        e.setLine(0, formatFirstLine());
-        e.setLine(1, formatItemStackLine(sellingItemStack));
-        e.setLine(2, formatItemStackLine(priceItemStack));
-        e.setLine(3, formatLastLine(player));
+        e.setLine(0, formatFirstLine(firstLine));
+        e.setLine(1, sellingLineFormatter.formatSelfInterpretedLine(sellingLineResult));
+        e.setLine(2, priceLineFormatter.formatSelfInterpretedLine(priceLineResult));
+        e.setLine(3, firstLine.getNameLineFormatter().formatPlayerFormattedLine(e.getLine(3), player));
 
         sendSetUpConfirmation(player);
-        sendClickToAnnounceMessage(player, sellingItemStack, priceItemStack);
+        //sendClickToAnnounceMessage(player, sellingItemStack, priceItemStack);
     }
 
-    private boolean validateFirstLine(String line) {
-        return LineChecker.sufficientFirstLine(line);
-    }
-
-    private boolean validateItemStack(ItemStack itemStack, Player signMaker, int line) {
-        if (itemStack == null) {
+    private boolean validateItemStackLineResult(Object result, IItemStackLineFormatter lineFormatter, Player signMaker, int line) {
+        if (!lineFormatter.isValidSelfInterpretation(result)) {
             Errors.showUserError(Errors.INVALID_LINE, signMaker, line);
             return false;
         }
@@ -60,28 +69,17 @@ public class SignEditListener implements Listener {
             && SBUtil.isContainer(SBUtil.getBehindBlock(block).getState()));
     }
 
-    private String formatFirstLine() {
-        return ChatColor.GOLD + LineChecker.REQUIRED_FIRST_LINE;
-    }
-
-    private String formatLastLine(Player player) {
-        return ChatColor.GRAY + "(" + player.getDisplayName() + ")";
-    }
-
-    private String formatItemStackLine(ItemStack itemStack) {
-        return ChatColor.WHITE
-            + SBUtil.cleanName(itemStack.getType().toString())
-            + Main.FORMATTED_ITEM_QUANTITY_SEPARATOR
-            + Integer.toString(itemStack.getAmount());
+    private String formatFirstLine(FirstLine firstLine) {
+        return ChatColor.GOLD + "[" + firstLine.getPerfectName() + "]";
     }
 
     private void sendSetUpConfirmation(Player player) {
         player.sendMessage(Main.MESSAGE_PREFIX + ChatColor.GREEN + "Shop setup successfully!");
-        player.sendMessage(Main.MESSAGE_PREFIX + "Make sure there is enough room in your chest for payment.");
+        player.sendMessage(Main.MESSAGE_PREFIX + "Make sure there is enough room in your container for payment.");
     }
 
     private TextComponent createClickToAnnounceMessage(String command) {
-        TextComponent message = new TextComponent("[Click to Announce]");
+        final TextComponent message = new TextComponent("[Click to Announce]");
         message.setColor(ChatColor.LIGHT_PURPLE);
         message.setUnderlined(true);
         message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command));
@@ -105,6 +103,7 @@ public class SignEditListener implements Listener {
         );
     }
 
+    @SuppressWarnings("unused")
     private void sendClickToAnnounceMessage(Player player, ItemStack selling, ItemStack price) {
         player.spigot().sendMessage(
             createClickToAnnounceMessage(

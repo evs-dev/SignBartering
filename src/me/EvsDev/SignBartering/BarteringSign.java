@@ -1,24 +1,21 @@
 package me.EvsDev.SignBartering;
 
-import org.bukkit.Bukkit;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public class BarteringSign {
 
-    public BarteringSign(Sign sign) throws BarteringSignCreationException {
-        if (!LineChecker.perfectFirstLine(sign.getLine(0))) throw new BarteringSignCreationException();
-        //this.sign = sign; Might be used later
-        sellingItemStack = LineChecker.parseItemAndQuantityLine(sign.getLine(1), Main.FORMATTED_ITEM_QUANTITY_SEPARATOR);
+    public BarteringSign(Sign sign, FirstLine firstLine) throws BarteringSignCreationException {
+        sellingItemStack = firstLine.getSellingLineFormatter().interpretSelfFormattedLine(sign.getLine(1));
         if (sellingItemStack == null) throw new BarteringSignCreationException(Errors.INVALID_SELLING_SIGN);
-        priceItemStack = LineChecker.parseItemAndQuantityLine(sign.getLine(2), Main.FORMATTED_ITEM_QUANTITY_SEPARATOR);
+
+        priceItemStack = firstLine.getPriceLineFormatter().interpretSelfFormattedLine(sign.getLine(2));
         if (priceItemStack == null) throw new BarteringSignCreationException(Errors.INVALID_SELLING_SIGN);
-        this.signOwner = getOwnerFromLine(sign.getLine(3));
-        if (signOwner == null) throw new BarteringSignCreationException(Errors.INVALID_SELLING_SIGN);
+
+        this.signOwner = firstLine.getNameLineFormatter().interpretSelfFormattedLine(sign.getLine(3));
     }
 
-    //private final Sign sign;
     private final ItemStack sellingItemStack;
     private final ItemStack priceItemStack;
     private final Player signOwner;
@@ -36,18 +33,15 @@ public class BarteringSign {
     }
 
     public static boolean playerIsSignOwner(Player player, Sign sign) {
+        if (sign == null || player == null) return false;
         String signName = SBUtil.removeBracketsFromSignLine(sign.getLine(3));
         return signName.equals(player.getDisplayName());
     }
 
     public static boolean playerIsSignOwner(Player player, BarteringSign sign) {
+        if (sign.getSignOwner() == null || player == null) return false;
         String signName = sign.getSignOwner().getDisplayName();
         return signName.equals(player.getDisplayName());
-    }
-
-    private static Player getOwnerFromLine(String ownerLine) {
-        String ownerName = SBUtil.removeBracketsFromSignLine(ownerLine);
-        return Bukkit.getPlayer(ownerName);
     }
 
     @SuppressWarnings("serial")
