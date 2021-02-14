@@ -39,7 +39,7 @@ public class InteractListener implements Listener {
     }
 
     private void onContainerInteractedWith(PlayerInteractEvent e) {
-        final Sign surroundingSign = SBUtil.findAttachedBarteringSign(e.getClickedBlock());
+        final Sign surroundingSign = SBUtil.findAttachedSign(e.getClickedBlock());
 
         if (surroundingSign == null) return;
 
