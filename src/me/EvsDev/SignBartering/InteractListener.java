@@ -65,7 +65,7 @@ public class InteractListener implements Listener {
         final BarteringSign barteringSign = createBarteringSign(sign, buyer, firstLine);
         if (barteringSign == null) return;
         final ItemStack sellingItemStack = barteringSign.getSellingItemStack();
-        // Can assume that the behind block is a container because of SignEditListener validation
+
         Inventory containerInv;
         try {
             containerInv = ((InventoryHolder)SBUtil.getBehindBlock(block).getState()).getInventory();
