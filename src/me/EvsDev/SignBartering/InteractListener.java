@@ -44,14 +44,12 @@ public class InteractListener implements Listener {
         if (surroundingSign == null) return;
 
         final FirstLine firstLine = FirstLine.interpretFirstLine(surroundingSign.getLine(0), true);
-        final boolean isOpOnly = firstLine != null && firstLine.onlyOp();
+        if (firstLine == null) return;
 
-        if (!(isOpOnly ? e.getPlayer().isOp() : true) && !BarteringSign.playerIsSignOwner(e.getPlayer(), surroundingSign)) {
+        if (firstLine.onlyOp() ? !e.getPlayer().isOp() : !BarteringSign.playerIsSignOwner(e.getPlayer(), surroundingSign)) {
             Errors.showUserError(Errors.NOT_THE_OWNER, e.getPlayer());
             e.setCancelled(true);
         }
-
-        return;
     }
 
     private void onSignInteractedWith(PlayerInteractEvent e) {
