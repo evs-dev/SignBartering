@@ -39,19 +39,17 @@ public class InteractListener implements Listener {
     }
 
     private void onContainerInteractedWith(PlayerInteractEvent e) {
-        final Sign surroundingSign = SBUtil.findAttachedBarteringSign(e.getClickedBlock());
+        final Sign surroundingSign = SBUtil.findAttachedSign(e.getClickedBlock());
 
         if (surroundingSign == null) return;
 
         final FirstLine firstLine = FirstLine.interpretFirstLine(surroundingSign.getLine(0), true);
-        final boolean isOpOnly = firstLine != null && firstLine.onlyOp();
+        if (firstLine == null) return;
 
-        if (!(isOpOnly ? e.getPlayer().isOp() : true) && !BarteringSign.playerIsSignOwner(e.getPlayer(), surroundingSign)) {
+        if (firstLine.onlyOp() ? !e.getPlayer().isOp() : !BarteringSign.playerIsSignOwner(e.getPlayer(), surroundingSign)) {
             Errors.showUserError(Errors.NOT_THE_OWNER, e.getPlayer());
             e.setCancelled(true);
         }
-
-        return;
     }
 
     private void onSignInteractedWith(PlayerInteractEvent e) {
@@ -67,7 +65,7 @@ public class InteractListener implements Listener {
         final BarteringSign barteringSign = createBarteringSign(sign, buyer, firstLine);
         if (barteringSign == null) return;
         final ItemStack sellingItemStack = barteringSign.getSellingItemStack();
-        // Can assume that the behind block is a container because of SignEditListener validation
+
         Inventory containerInv;
         try {
             containerInv = ((InventoryHolder)SBUtil.getBehindBlock(block).getState()).getInventory();

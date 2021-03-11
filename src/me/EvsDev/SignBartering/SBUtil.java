@@ -66,13 +66,12 @@ public final class SBUtil {
         return (blockState instanceof InventoryHolder);
     }
 
-    public static Sign findAttachedBarteringSign(Block startBlock) {
+    public static Sign findAttachedSign(Block startBlock) {
         for (BlockFace face : horizontalBlockFaces) {
             final Block block = startBlock.getRelative(face);
 
             if (isWallSign(block.getType())) {
-                final Sign sign = (Sign) block.getState();
-                if (FirstLine.interpretFirstLine(sign.getLine(0), true) != null) return sign;
+                return (Sign) block.getState();
             }
         }
         return null;
